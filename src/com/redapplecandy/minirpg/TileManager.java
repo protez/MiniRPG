@@ -40,8 +40,8 @@ public class TileManager {
 	
 	private TileManager() {
 		
-		m_dungeonTiles_far = BitmapLoader.instance().loadById(R.drawable.dungeon_far);
-		m_dungeonTiles_near = BitmapLoader.instance().loadById(R.drawable.dungeon_close);
+		m_dungeonTiles_far = BitmapLoader.instance().loadById(R.drawable.dungeon_far_hires);
+		m_dungeonTiles_near = BitmapLoader.instance().loadById(R.drawable.dungeon_close_hires);
 		
 		m_dungeonTiles = new Vector<Bitmap>();
 		
