@@ -1,9 +1,10 @@
 package com.redapplecandy.minirpg.character;
 
+import com.redapplecandy.minirpg.BattleEntity;
 import com.redapplecandy.minirpg.Pair;
 import com.redapplecandy.minirpg.items.Item;
 
-public class Character {
+public class Character extends BattleEntity {
 
 	public static final int
 		WEAPON_SLOT = 0,
@@ -13,10 +14,7 @@ public class Character {
 		RING_SLOT = 4,
 		MISC_SLOT = 5;
 	
-	private String m_name;
-	private Pair<Integer, Integer> 
-		m_hp, m_sp, m_strength, m_endurance, m_intellect, m_luck, m_speed;
-	private int m_level, m_experience;
+
 	private PlayerClass m_class;
 	private Item[] m_inventory;
 	private Item[] m_equipment;

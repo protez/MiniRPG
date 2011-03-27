@@ -1,12 +1,14 @@
 package com.redapplecandy.minirpg.character;
 
+import com.redapplecandy.minirpg.BattleEntity;
+
 public class Party {
 
 	private int m_gold;
-	private Character[] m_members;
+	private BattleEntity[] m_members;
 	
 	private Party() {
-		m_members = new Character[4];
+		m_members = new BattleEntity[4];
 	}
 	
 	static Party createTestPart() {
