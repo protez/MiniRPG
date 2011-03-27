@@ -2,15 +2,20 @@ package com.redapplecandy.minirpg;
 
 import java.util.Vector;
 
+import com.redapplecandy.minirpg.dungeonfeatures.wallfeatures.WallFeature;
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
 public class TileMap {
 
-	int[][] m_tiles;
+	private int[][] m_tiles;
+	private Vector<WallFeature> m_wallFeatures;
+	
 	
 	public TileMap() {
 		
+		m_wallFeatures = new Vector<WallFeature>();
 		m_tiles = new int[8][8];
 		
 		int[][] tiles = {
@@ -153,6 +158,84 @@ public class TileMap {
 		}
 		
 		return tileIndices;
+	}
+	
+	public void drawFeatures(Canvas canvas, int srcX, int srcY, int dir) {
+		int xdir = 0, ydir = 0;
+		int xmul = 0, ymul = 0;
+		boolean flip = false;
+		
+		if (dir == Direction.RIGHT) {
+			xdir = 1;
+			xmul = 0;
+			ymul = 1;
+			ydir = 0;
+			flip = false;
+		} else if (dir == Direction.LEFT) {
+			xdir = -1;
+			xmul = 0;
+			ymul = 1;
+			ydir = 0;
+			flip = true;
+		} else if (dir == Direction.UP) {
+			xdir = 0;
+			xmul = 1;
+			ymul = 0;
+			ydir = -1;
+			flip = false;
+		} else if (dir == Direction.DOWN) {
+			xdir = 0;
+			xmul = 1;
+			ymul = 0;
+			ydir = 1;
+			flip = true;
+		}
+		
+		for (WallFeature wf : m_wallFeatures) {
+			
+			// First check if the player is on the correct side of the wall
+			// to see this feature...
+			if (wf.side() == Direction.DOWN) {
+				if (!(srcX == wf.x() && srcY > wf.y())) {
+					// Player must be below.
+					continue;
+				}
+			} else if (wf.side() == Direction.UP) {
+				if (!(srcX == wf.x() && srcY < wf.y())) {
+					// Player must be above.
+					continue;
+				}
+			} else if (wf.side() == Direction.RIGHT){
+				if (!(srcX > wf.x() && srcY == wf.y())) {
+					// Player must stand on the right side.
+					continue;
+				}
+			} else if (wf.side() == Direction.LEFT) {
+				if (!(srcX < wf.x() && srcY == wf.y())) {
+					// Player must stand on left side.
+					continue;
+				}
+			}
+			
+			if (srcX + xdir == wf.x() && srcY + ydir == wf.y()) {
+				// Front
+				wf.draw(canvas, WallFeature.NEAR_FRONT);
+			} else if (m_tiles[srcY + ydir][srcX + xdir] == 0 && srcX + 2*xdir == wf.x() && srcY + 2*ydir == wf.y()) {
+				// Far front
+				wf.draw(canvas, WallFeature.FAR_FRONT);
+			} else if (srcX - xmul == wf.x() && srcY - ymul == wf.y()) {
+				// Left
+				wf.draw(canvas, !flip ? WallFeature.LEFT : WallFeature.RIGHT);
+			} else if (srcX + xmul == wf.x() && srcY + ymul == wf.y()) {
+				// Right
+				wf.draw(canvas, !flip ? WallFeature.RIGHT : WallFeature.LEFT);
+			}
+			
+		}
+	}
+	
+	public void addFeature(WallFeature wf) {
+		m_wallFeatures.add(wf);
 	}
 	
 	public void debugDraw(Canvas canvas) {

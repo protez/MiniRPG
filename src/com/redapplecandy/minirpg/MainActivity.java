@@ -22,12 +22,19 @@ public class MainActivity extends Activity {
         m_renderView = (RenderView) findViewById(R.id.gameView);
         BitmapLoader.instance().setContext(this);
         TileManager.instance();
-    
+        
+        m_renderView.createFeature();
+        
         m_up = (Button) this.findViewById(R.id.buttonUp);
         m_down = (Button) this.findViewById(R.id.buttonDown);
         
         m_turnLeft = (Button) findViewById(R.id.buttonUpLeft);
         m_turnRight = (Button) findViewById(R.id.buttonUpRight);
+        
+        m_up.setText("Forwards");
+        m_down.setText("Backwards");
+        m_turnLeft.setText("Left");
+        m_turnRight.setText("Right");
         
         m_turnLeft.setOnClickListener(new OnClickListener() {
 

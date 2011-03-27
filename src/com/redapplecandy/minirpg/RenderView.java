@@ -2,10 +2,13 @@ package com.redapplecandy.minirpg;
 
 import java.util.Vector;
 
+import com.redapplecandy.minirpg.dungeonfeatures.wallfeatures.WallFeature;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -26,23 +29,7 @@ public class RenderView extends View {
 	
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		canvas.drawARGB(255, 255, 0, 0);
-		
-		/*
-		Bitmap bmp1 = TileManager.instance().getTile(TileManager.NEAR_CORRIDOR_LEFT);
-		Bitmap bmp2 = TileManager.instance().getTile(TileManager.FAR_WALL);
-		Bitmap bmp3 = TileManager.instance().getTile(TileManager.NEAR_INTERSECT_RIGHT);
-		
-		Bitmap bmp4 = TileManager.instance().getTile(TileManager.FAR_CORRIDOR_LEFT);
-		Bitmap bmp5 = TileManager.instance().getTile(TileManager.FAR_INTERSECT_RIGHT);
-		
-		canvas.drawBitmap(bmp1, 0, 24, null);
-		canvas.drawBitmap(bmp2, 96, 24, null);
-		canvas.drawBitmap(bmp3, 192, 24, null);
-		
-		canvas.drawBitmap(bmp4, 96, 24, null);
-		canvas.drawBitmap(bmp5, 144, 24, null);
-		*/
+		canvas.drawARGB(255, 0, 0, 0);
 		
 		Vector<Integer> visibleNear = m_tilemap.getVisibleNearTiles(curX, curY, curDir);
 		
@@ -54,7 +41,7 @@ public class RenderView extends View {
 
 			// First 6 will be wall tiles that we can safely draw over later.
 			if (type == TileManager.FAR_WALL || type == TileManager.FAR_EMPTY) {
-				canvas.drawBitmap(bmp, i * 96, 24, null);
+				canvas.drawBitmap(bmp, Config.VIEW_CORNER_X + i * Config.TILE_WIDTH, Config.VIEW_CORNER_Y, null);
 			}
 		}
 		
@@ -66,12 +53,12 @@ public class RenderView extends View {
 			if (type == TileManager.FAR_CORRIDOR_LEFT 
 				|| type == TileManager.FAR_INTERSECT_LEFT) 
 			{
-				canvas.drawBitmap(bmp, 96, 24, null);
+				canvas.drawBitmap(bmp, Config.VIEW_CORNER_X + Config.TILE_WIDTH, Config.VIEW_CORNER_Y, null);
 			}
 			if (type == TileManager.FAR_CORRIDOR_RIGHT 
 				|| type == TileManager.FAR_INTERSECT_RIGHT) 
 			{
-				canvas.drawBitmap(bmp, 144, 24, null);
+				canvas.drawBitmap(bmp, Config.VIEW_CORNER_X + Config.TILE_WIDTH + Config.FAR_TILE_WIDTH, Config.VIEW_CORNER_Y, null);
 			}
 			
 		}
@@ -83,21 +70,23 @@ public class RenderView extends View {
 			if (type >= TileManager.NEAR_WALL_LEFT 
 				&& type <= TileManager.NEAR_WALL_RIGHT) 
 			{
-				canvas.drawBitmap(bmp, (i - 3) * 96, 24, null);
+				canvas.drawBitmap(bmp, Config.VIEW_CORNER_X + (i - 3) * Config.TILE_WIDTH, Config.VIEW_CORNER_Y, null);
 			}
 			
 			if (type == TileManager.NEAR_CORRIDOR_LEFT 
 				|| type == TileManager.NEAR_INTERSECT_LEFT) 
 			{
-				canvas.drawBitmap(bmp, 0, 24, null);
+				canvas.drawBitmap(bmp, Config.VIEW_CORNER_X, Config.VIEW_CORNER_Y, null);
 			}
 			if (type == TileManager.NEAR_CORRIDOR_RIGHT
 				|| type == TileManager.NEAR_INTERSECT_RIGHT) 
 			{
-				canvas.drawBitmap(bmp, 192, 24, null);
+				canvas.drawBitmap(bmp, Config.VIEW_CORNER_X + Config.TILE_WIDTH * 2, Config.VIEW_CORNER_Y, null);
 			}
 			
 		}
+		
+		m_tilemap.drawFeatures(canvas, curX, curY, curDir);
 		
 		Paint paint = new Paint();
 		paint.setARGB(255, 0, 255, 255);
@@ -114,6 +103,18 @@ public class RenderView extends View {
 			canvas.drawLine(curX*8+4, curY*8+4, curX*8+4, curY*8+4+4, paint2);
 		
 		m_tilemap.debugDraw(canvas);
+		
+		Paint textPaint = new Paint();
+		textPaint.setARGB(255, 255, 255, 255);
+		Typeface typeface = Typeface.create("Helvetica", Typeface.NORMAL);
+		textPaint.setTypeface(typeface);
+		canvas.drawText("Im cool", 4, Config.STATUS_BAR_POS, textPaint);
+	}
+	
+	public void createFeature() {
+		m_tilemap.addFeature(new WallFeature(R.drawable.wall_feature_cave_door, 5, 1, Direction.DOWN));
+		m_tilemap.addFeature(new WallFeature(R.drawable.wall_feature_cave_door, 6, 2, Direction.LEFT));
+		m_tilemap.addFeature(new WallFeature(R.drawable.wall_feature_cave_door, 5, 3, Direction.UP));
 	}
 	
 	protected void onMeasure(int measureWidth, int measureHeight) {
