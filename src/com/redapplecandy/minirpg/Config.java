@@ -11,5 +11,10 @@ public class Config {
 	
 	public static final int STATUS_BAR_POS = VIEW_CORNER_Y + TILE_HEIGHT + 16;
 	
+	public static final int MAIN_WINDOW_WIDTH = 320;
+	public static final int MAIN_WINDOW_HEIGHT = 240;
+	
+	public static final int MESSAGE_BOX_HEIGHT = 64;
+	
 	//public static final int MIDDLE_TILE_POS = 96;
 }

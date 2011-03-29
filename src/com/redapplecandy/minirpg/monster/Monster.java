@@ -16,5 +16,9 @@ public class Monster extends BattleEntity {
 	public void draw(Canvas canvas, int x, int y) {
 		canvas.drawBitmap(m_sprite, x, y, null);
 	}
+
 	
+	public Bitmap getSprite() {
+		return m_sprite;
+	}
 }

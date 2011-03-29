@@ -1,19 +1,23 @@
 package com.redapplecandy.minirpg;
 
+import com.redapplecandy.minirpg.ui.InvisibleButton;
+
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
 
 public class MainActivity extends Activity {
     
 	RenderView m_renderView;
-	Button m_up;
-	Button m_down;
+	InvisibleButton m_up;
+	InvisibleButton m_down;
 	
-	Button m_turnLeft;
-	Button m_turnRight;
+	InvisibleButton m_turnLeft;
+	InvisibleButton m_turnRight;
 	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,6 +29,7 @@ public class MainActivity extends Activity {
         
         m_renderView.createFeature();
         
+        /*
         m_up = (Button) this.findViewById(R.id.buttonUp);
         m_down = (Button) this.findViewById(R.id.buttonDown);
         
@@ -35,7 +40,19 @@ public class MainActivity extends Activity {
         m_down.setText("Backwards");
         m_turnLeft.setText("Left");
         m_turnRight.setText("Right");
+        */
         
+    	m_up = new InvisibleButton(64, 0, 0, Config.MAIN_WINDOW_WIDTH - 128, 64);
+    	m_down = new InvisibleButton(64, Config.MAIN_WINDOW_HEIGHT - 64, 0, Config.MAIN_WINDOW_WIDTH - 128, 64);
+    	
+    	m_turnLeft = new InvisibleButton(0, 64, 0, 64, Config.MAIN_WINDOW_HEIGHT - 128);
+    	m_turnRight = new InvisibleButton(Config.MAIN_WINDOW_WIDTH - 64, 64, 0, 64, Config.MAIN_WINDOW_HEIGHT - 128);
+        
+    	m_renderView.addButton(m_up);
+    	m_renderView.addButton(m_down);
+    	m_renderView.addButton(m_turnLeft);
+    	m_renderView.addButton(m_turnRight);
+    	
         m_turnLeft.setOnClickListener(new OnClickListener() {
 
 			@Override

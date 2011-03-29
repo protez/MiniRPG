@@ -1,7 +1,9 @@
-package com.redapplecandy.minirpg;
+package com.redapplecandy.minirpg.maps;
 
 import java.util.Vector;
 
+import com.redapplecandy.minirpg.Direction;
+import com.redapplecandy.minirpg.TileManager;
 import com.redapplecandy.minirpg.dungeonfeatures.wallfeatures.WallFeature;
 
 import android.graphics.Canvas;

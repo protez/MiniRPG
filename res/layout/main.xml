@@ -6,26 +6,19 @@
     >
     <TableLayout android:layout_width="fill_parent" android:id="@+id/tableLayout1" android:layout_height="fill_parent">
         
-            <com.redapplecandy.minirpg.RenderView android:id="@+id/gameView" android:layout_width="fill_parent" android:layout_height="240px" />
+            <com.redapplecandy.minirpg.RenderView android:id="@+id/gameView" android:layout_width="fill_parent" android:layout_height="fill_parent" />
         
-        
+        <!-- 
             <TableLayout android:id="@+id/tableLayout2" android:layout_width="fill_parent" android:layout_height="wrap_content">
                 <TableRow android:id="@+id/tableRow3" android:layout_width="fill_parent" android:layout_height="wrap_content">
-                    <Button android:text="Northwest" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/buttonUpLeft"></Button>
-                    <Button android:text="North" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/buttonUp"></Button>
-                    <Button android:text="Northeast" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/buttonUpRight"></Button>
-                </TableRow>
-                <TableRow android:id="@+id/tableRow4" android:layout_width="fill_parent" android:layout_height="wrap_content">
-                    <Button android:text="West" android:id="@+id/buttonLeft" android:layout_width="fill_parent" android:layout_height="wrap_content"></Button>
-                    <Button android:text="Button" android:id="@+id/buttonCenter" android:layout_width="fill_parent" android:layout_height="wrap_content"></Button>
-                    <Button android:text="East" android:id="@+id/buttonRight" android:layout_width="fill_parent" android:layout_height="wrap_content"></Button>
+                    <Button android:text="Left" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/buttonUpLeft"></Button>
+                    <Button android:text="Forward" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/buttonUp"></Button>
+                    <Button android:text="Right" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/buttonUpRight"></Button>
                 </TableRow>
                 <TableRow android:id="@+id/tableRow5" android:layout_width="fill_parent" android:layout_height="wrap_content">
-                    <Button android:text="Southwest" android:id="@+id/buttonDownLeft" android:layout_width="fill_parent" android:layout_height="wrap_content"></Button>
-                    <Button android:text="South" android:id="@+id/buttonDown" android:layout_width="fill_parent" android:layout_height="wrap_content"></Button>
-                    <Button android:text="Southeast" android:id="@+id/buttonDownRight" android:layout_width="fill_parent" android:layout_height="wrap_content"></Button>
+                    <Button android:text="Backward" android:id="@+id/buttonDown" android:layout_width="fill_parent" android:layout_height="wrap_content"></Button>
                 </TableRow>
             </TableLayout>
-        
+        -->
     </TableLayout>
 </LinearLayout>

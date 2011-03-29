@@ -3,28 +3,42 @@ package com.redapplecandy.minirpg;
 import java.util.Vector;
 
 import com.redapplecandy.minirpg.dungeonfeatures.wallfeatures.WallFeature;
+import com.redapplecandy.minirpg.maps.TileMap;
+import com.redapplecandy.minirpg.ui.InvisibleButton;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 
-public class RenderView extends View {
+/**
+ * Renders the game. I'm using this as a testclass for everything atm.
+ * @author tomas
+ */
+public class RenderView extends View implements OnTouchListener {
 
+	Vector<InvisibleButton> m_buttons = new Vector<InvisibleButton>();
+	
 	TileMap m_tilemap = new TileMap();
+	MessageBox m_messageBox = new MessageBox();
 	
 	public int curX = 2, curY = 2;
 	public int curDir = 0;
 	
 	public RenderView(Context context) {
 		super(context);
+		
+		setOnTouchListener(this);
 	}
 
 	public RenderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		
+		setOnTouchListener(this);
 	}
 	
 	protected void onDraw(Canvas canvas) {
@@ -104,11 +118,13 @@ public class RenderView extends View {
 		
 		m_tilemap.debugDraw(canvas);
 		
-		Paint textPaint = new Paint();
-		textPaint.setARGB(255, 255, 255, 255);
-		Typeface typeface = Typeface.create("Helvetica", Typeface.NORMAL);
-		textPaint.setTypeface(typeface);
-		canvas.drawText("Im cool", 4, Config.STATUS_BAR_POS, textPaint);
+		StatusText.draw(canvas);
+		
+		m_messageBox.draw(canvas);
+		
+		for (InvisibleButton b : m_buttons) {
+			b.debugDraw(canvas);
+		}
 	}
 	
 	public void createFeature() {
@@ -119,6 +135,31 @@ public class RenderView extends View {
 	
 	protected void onMeasure(int measureWidth, int measureHeight) {
 		super.onMeasure(measureWidth, measureHeight);
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		
+		if (event.getAction() == MotionEvent.ACTION_UP) {
+		
+			Integer x = (int) event.getX();
+			Integer y = (int) event.getY();
+			StatusText.statusText = "X: " + x.toString() + "; Y: " + y.toString();
+		
+			for (InvisibleButton b : m_buttons) {
+				if (b.isClicked(x, y)) {
+					b.fireClick();
+				}
+			}
+			
+			this.invalidate();
+		}
+		
+		return true;
+	}
+	
+	public void addButton(InvisibleButton b) {
+		m_buttons.add(b);
 	}
 	
 }

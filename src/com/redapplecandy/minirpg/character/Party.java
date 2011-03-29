@@ -11,7 +11,19 @@ public class Party {
 		m_members = new BattleEntity[4];
 	}
 	
-	static Party createTestPart() {
+	public BattleEntity getMember(int index) throws IndexOutOfBoundsException {
+		if (index > m_members.length) {
+			throw new IndexOutOfBoundsException();
+		}
+		
+		return m_members[index];
+	}
+	
+	public int size() {
+		return m_members.length;
+	}
+	
+	public static Party createTestPart() {
 		Party testParty = new Party();
 		for (int i = 0; i < 4; i++) {
 			testParty.m_members[i] = Character.createTestCharacter();
