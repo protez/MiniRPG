@@ -27,20 +27,9 @@ public class MainActivity extends Activity {
         BitmapLoader.instance().setContext(this);
         TileManager.instance();
         
-        m_renderView.createFeature();
+        Core.instance().setRenderView(m_renderView);
         
-        /*
-        m_up = (Button) this.findViewById(R.id.buttonUp);
-        m_down = (Button) this.findViewById(R.id.buttonDown);
-        
-        m_turnLeft = (Button) findViewById(R.id.buttonUpLeft);
-        m_turnRight = (Button) findViewById(R.id.buttonUpRight);
-        
-        m_up.setText("Forwards");
-        m_down.setText("Backwards");
-        m_turnLeft.setText("Left");
-        m_turnRight.setText("Right");
-        */
+        //m_renderView.createFeature();
         
     	m_up = new InvisibleButton(64, 0, 0, Config.MAIN_WINDOW_WIDTH - 128, 64);
     	m_down = new InvisibleButton(64, Config.MAIN_WINDOW_HEIGHT - 64, 0, Config.MAIN_WINDOW_WIDTH - 128, 64);
@@ -57,14 +46,14 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				if (m_renderView.curDir == Direction.RIGHT)
-					m_renderView.curDir = Direction.UP;
-				else if (m_renderView.curDir == Direction.LEFT)
-					m_renderView.curDir = Direction.DOWN;
-				else if (m_renderView.curDir == Direction.UP)
-					m_renderView.curDir = Direction.LEFT;
-				else if (m_renderView.curDir == Direction.DOWN)
-					m_renderView.curDir = Direction.RIGHT;
+				if (Core.instance().camera().direction == Direction.RIGHT)
+					Core.instance().camera().direction = Direction.UP;
+				else if (Core.instance().camera().direction == Direction.LEFT)
+					Core.instance().camera().direction = Direction.DOWN;
+				else if (Core.instance().camera().direction == Direction.UP)
+					Core.instance().camera().direction = Direction.LEFT;
+				else if (Core.instance().camera().direction == Direction.DOWN)
+					Core.instance().camera().direction = Direction.RIGHT;
 				
 				m_renderView.invalidate();
 			}
@@ -74,14 +63,14 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				if (m_renderView.curDir == Direction.RIGHT)
-					m_renderView.curDir = Direction.DOWN;
-				else if (m_renderView.curDir == Direction.LEFT)
-					m_renderView.curDir = Direction.UP;
-				else if (m_renderView.curDir == Direction.UP)
-					m_renderView.curDir = Direction.RIGHT;
-				else if (m_renderView.curDir == Direction.DOWN)
-					m_renderView.curDir = Direction.LEFT;
+				if (Core.instance().camera().direction == Direction.RIGHT)
+					Core.instance().camera().direction = Direction.DOWN;
+				else if (Core.instance().camera().direction == Direction.LEFT)
+					Core.instance().camera().direction = Direction.UP;
+				else if (Core.instance().camera().direction == Direction.UP)
+					Core.instance().camera().direction = Direction.RIGHT;
+				else if (Core.instance().camera().direction == Direction.DOWN)
+					Core.instance().camera().direction = Direction.LEFT;
 				
 				m_renderView.invalidate();
 			}
@@ -92,14 +81,25 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				if (m_renderView.curDir == 0)
-					m_renderView.curX++;
-				if (m_renderView.curDir == 1)
-					m_renderView.curX--;
-				if (m_renderView.curDir == 2)
-					m_renderView.curY--;
-				if (m_renderView.curDir == 3)
-					m_renderView.curY++;
+				Core core = Core.instance();
+				
+				int tempX = core.camera().x;
+				int tempY = core.camera().y;
+				
+				if (core.camera().direction == Direction.RIGHT)
+					core.camera().x++;
+				if (core.camera().direction == Direction.LEFT)
+					core.camera().x--;
+				if (core.camera().direction == Direction.UP)
+					core.camera().y--;
+				if (core.camera().direction == Direction.DOWN)
+					core.camera().y++;
+				
+				if (core.currentLevel().isSolid(core.camera().x, core.camera().y)) {
+					core.camera().x = tempX;
+					core.camera().y = tempY;
+				}
+				
 				m_renderView.invalidate();
 			}
         	
@@ -109,14 +109,25 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				if (m_renderView.curDir == 0)
-					m_renderView.curX--;
-				if (m_renderView.curDir == 1)
-					m_renderView.curX++;
-				if (m_renderView.curDir == 2)
-					m_renderView.curY++;
-				if (m_renderView.curDir == 3)
-					m_renderView.curY--;
+				Core core = Core.instance();
+				
+				int tempX = core.camera().x;
+				int tempY = core.camera().y;
+				
+				if (core.camera().direction == Direction.RIGHT)
+					core.camera().x--;
+				if (core.camera().direction == Direction.LEFT)
+					core.camera().x++;
+				if (core.camera().direction == Direction.UP)
+					core.camera().y++;
+				if (core.camera().direction == Direction.DOWN)
+					core.camera().y--;
+				
+				if (core.currentLevel().isSolid(core.camera().x, core.camera().y)) {
+					core.camera().x = tempX;
+					core.camera().y = tempY;
+				}
+				
 				m_renderView.invalidate();
 			}
         	
