@@ -2,7 +2,7 @@ package com.redapplecandy.minirpg.util;
 
 import java.util.Comparator;
 
-import com.redapplecandy.minirpg.BattleEntity;
+import com.redapplecandy.minirpg.battle.BattleEntity;
 
 public class BattlerComparator implements Comparator<BattleEntity> {
 

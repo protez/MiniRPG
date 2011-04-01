@@ -2,6 +2,8 @@ package com.redapplecandy.minirpg;
 
 import java.util.Vector;
 
+import com.redapplecandy.minirpg.character.PlayerCharacter;
+import com.redapplecandy.minirpg.ui.CharacterWidget;
 import com.redapplecandy.minirpg.ui.InvisibleButton;
 
 import android.content.Context;
@@ -22,6 +24,12 @@ public class RenderView extends View implements OnTouchListener {
 	Vector<InvisibleButton> m_buttons = new Vector<InvisibleButton>();
 
 	MessageBox m_messageBox = new MessageBox();
+	
+	PlayerCharacter testCharacter = PlayerCharacter.createTestCharacter();
+	CharacterWidget characterWidget = new CharacterWidget(testCharacter, 0, 0);
+	CharacterWidget characterWidget2 = new CharacterWidget(testCharacter, 76, 0);
+	CharacterWidget characterWidget3 = new CharacterWidget(testCharacter, 152, 0);
+	CharacterWidget characterWidget4 = new CharacterWidget(testCharacter, 228, 0);
 	
 	public RenderView(Context context) {
 		super(context);
@@ -66,6 +74,11 @@ public class RenderView extends View implements OnTouchListener {
 		for (InvisibleButton b : m_buttons) {
 			b.debugDraw(canvas);
 		}
+		
+		characterWidget.draw(canvas);
+		characterWidget2.draw(canvas);
+		characterWidget3.draw(canvas);
+		characterWidget4.draw(canvas);
 	}
 	
 	/*

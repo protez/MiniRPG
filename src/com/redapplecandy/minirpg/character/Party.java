@@ -1,6 +1,6 @@
 package com.redapplecandy.minirpg.character;
 
-import com.redapplecandy.minirpg.BattleEntity;
+import com.redapplecandy.minirpg.battle.BattleEntity;
 
 public class Party {
 
@@ -26,7 +26,7 @@ public class Party {
 	public static Party createTestPart() {
 		Party testParty = new Party();
 		for (int i = 0; i < 4; i++) {
-			testParty.m_members[i] = Character.createTestCharacter();
+			testParty.m_members[i] = PlayerCharacter.createTestCharacter();
 		}
 		testParty.m_gold = 200;
 		return testParty;

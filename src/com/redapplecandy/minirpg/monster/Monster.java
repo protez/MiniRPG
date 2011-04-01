@@ -3,7 +3,7 @@ package com.redapplecandy.minirpg.monster;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-import com.redapplecandy.minirpg.BattleEntity;
+import com.redapplecandy.minirpg.battle.BattleEntity;
 
 public class Monster extends BattleEntity {
 	

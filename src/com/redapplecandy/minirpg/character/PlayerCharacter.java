@@ -1,10 +1,10 @@
 package com.redapplecandy.minirpg.character;
 
-import com.redapplecandy.minirpg.BattleEntity;
 import com.redapplecandy.minirpg.Pair;
+import com.redapplecandy.minirpg.battle.BattleEntity;
 import com.redapplecandy.minirpg.items.Item;
 
-public class Character extends BattleEntity {
+public class PlayerCharacter extends BattleEntity {
 
 	public static final int
 		WEAPON_SLOT = 0,
@@ -19,17 +19,17 @@ public class Character extends BattleEntity {
 	private Item[] m_inventory;
 	private Item[] m_equipment;
 	
-	private Character() {
+	private PlayerCharacter() {
 		m_inventory = new Item[6];
 		m_equipment = new Item[6];
 	}
 	
 	
-	static Character createTestCharacter() {
-		Character c = new Character();
+	public static PlayerCharacter createTestCharacter() {
+		PlayerCharacter c = new PlayerCharacter();
 		
 		c.m_name = "TestChar";
-		c.m_hp = new Pair<Integer, Integer>(20, 20);
+		c.m_hp = new Pair<Integer, Integer>(999, 999);
 		c.m_sp = new Pair<Integer, Integer>(15, 15);
 		
 		c.m_strength = new Pair<Integer, Integer>(18, 18);

@@ -1,7 +1,7 @@
 package com.redapplecandy.minirpg.abilities;
 
-import com.redapplecandy.minirpg.BattleEntity;
 import com.redapplecandy.minirpg.battle.Battle;
+import com.redapplecandy.minirpg.battle.BattleEntity;
 
 /**
  * An abstract <i>ability</i> class. Each ability should inherit

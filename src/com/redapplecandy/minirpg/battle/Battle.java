@@ -5,7 +5,6 @@ import java.util.PriorityQueue;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-import com.redapplecandy.minirpg.BattleEntity;
 import com.redapplecandy.minirpg.Config;
 import com.redapplecandy.minirpg.character.Party;
 import com.redapplecandy.minirpg.monster.Monster;
