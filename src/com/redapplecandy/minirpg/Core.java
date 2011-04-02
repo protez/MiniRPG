@@ -2,6 +2,7 @@ package com.redapplecandy.minirpg;
 
 import com.redapplecandy.minirpg.character.Party;
 import com.redapplecandy.minirpg.maps.Level;
+import com.redapplecandy.minirpg.ui.MessageBox;
 
 public class Core {
 
@@ -11,7 +12,12 @@ public class Core {
 		STATE_WAIT_MESSAGE = 2,
 		STATE_CHARACTER_SHEET = 3;
 	
-	public int currentState = STATE_WALK_AROUND;
+	/**
+	 * Use later.
+	 */
+	private int m_savedState = STATE_WALK_AROUND;
+	
+	private int m_currentState = STATE_WALK_AROUND;
 		
 	private static Core m_instance = null;
 	private RenderView m_renderView;
@@ -19,6 +25,8 @@ public class Core {
 	
 	private Camera m_camera;
 	private Level m_currentLevel;
+	
+	private MessageBox m_messageBox = new MessageBox();
 	
 	private Core() {
 		m_camera = new Camera(2, 2, Direction.RIGHT);
@@ -46,6 +54,48 @@ public class Core {
 	
 	public Camera camera() {
 		return m_camera;
+	}
+	
+	public void setState(int state) {
+		m_currentState = state;
+		// TODO: Stuff that happens when the state changes.
+		
+		if (state == Core.STATE_SHOW_MESSAGE) {
+			Thread t = new Thread(
+				new Runnable() {
+
+					@Override
+					public synchronized void run() {
+						
+						while (!m_messageBox.done()) {
+							
+							m_messageBox.advance();
+							//	this.wait(200);
+							m_renderView.invalidate();
+							
+						}
+						Core.instance().setState(Core.STATE_WAIT_MESSAGE);
+						
+					}
+					
+				});
+			t.start();
+		}
+		
+	}
+	
+	public int currentState() {
+		return m_currentState;
+	}
+	
+	
+	public MessageBox getMessageBox() {
+		return m_messageBox;
+	}
+	
+	public void startMessage(String message) {
+		m_messageBox.setMessage(message);
+		setState(Core.STATE_SHOW_MESSAGE);
 	}
 	
 }

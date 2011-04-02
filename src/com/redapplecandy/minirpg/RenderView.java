@@ -5,6 +5,7 @@ import java.util.Vector;
 import com.redapplecandy.minirpg.character.PlayerCharacter;
 import com.redapplecandy.minirpg.ui.CharacterWidget;
 import com.redapplecandy.minirpg.ui.InvisibleButton;
+import com.redapplecandy.minirpg.ui.MessageBox;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,8 +23,6 @@ import android.view.View.OnTouchListener;
 public class RenderView extends View implements OnTouchListener {
 
 	Vector<InvisibleButton> m_buttons = new Vector<InvisibleButton>();
-
-	MessageBox m_messageBox = new MessageBox();
 	
 	PlayerCharacter testCharacter = PlayerCharacter.createTestCharacter();
 	CharacterWidget characterWidget = new CharacterWidget(testCharacter, 0, 0);
@@ -69,10 +68,10 @@ public class RenderView extends View implements OnTouchListener {
 		
 		StatusText.draw(canvas);
 		
-		m_messageBox.draw(canvas);
+		core.getMessageBox().draw(canvas);
 		
 		for (InvisibleButton b : m_buttons) {
-			b.debugDraw(canvas);
+		//	b.debugDraw(canvas);
 		}
 		
 		characterWidget.draw(canvas);
@@ -102,13 +101,25 @@ public class RenderView extends View implements OnTouchListener {
 			Integer y = (int) event.getY();
 			StatusText.statusText = "X: " + x.toString() + "; Y: " + y.toString();
 		
-			for (InvisibleButton b : m_buttons) {
-				if (b.isClicked(x, y)) {
-					b.fireClick();
+			if (Core.instance().currentState() == Core.STATE_WALK_AROUND) {
+				// If STATE == WALK_AROUND then fire movement events.
+				
+				for (InvisibleButton b : m_buttons) {
+					if (b.isClicked(x, y)) {
+						b.fireClick();
+					}
 				}
-			}
 			
-			this.invalidate();
+				this.invalidate();
+			
+			} else if (Core.instance().currentState() == Core.STATE_WAIT_MESSAGE) {
+				// If STATE == WAIT_MESSAGE, then pressing will escape from the
+				// currently displayed message.
+				
+				// TODO: The state to change to will depend on a number of things
+				// later (a saved state? We'll see...).
+				Core.instance().setState(Core.STATE_WALK_AROUND);
+			}
 		}
 		
 		return true;

@@ -46,16 +46,21 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				if (Core.instance().camera().direction == Direction.RIGHT)
-					Core.instance().camera().direction = Direction.UP;
-				else if (Core.instance().camera().direction == Direction.LEFT)
-					Core.instance().camera().direction = Direction.DOWN;
-				else if (Core.instance().camera().direction == Direction.UP)
-					Core.instance().camera().direction = Direction.LEFT;
-				else if (Core.instance().camera().direction == Direction.DOWN)
-					Core.instance().camera().direction = Direction.RIGHT;
 				
-				m_renderView.invalidate();
+				if (Core.instance().currentState() == Core.STATE_WALK_AROUND) {
+				
+					if (Core.instance().camera().direction == Direction.RIGHT)
+						Core.instance().camera().direction = Direction.UP;
+					else if (Core.instance().camera().direction == Direction.LEFT)
+						Core.instance().camera().direction = Direction.DOWN;
+					else if (Core.instance().camera().direction == Direction.UP)
+						Core.instance().camera().direction = Direction.LEFT;
+					else if (Core.instance().camera().direction == Direction.DOWN)
+						Core.instance().camera().direction = Direction.RIGHT;
+					
+					m_renderView.invalidate();
+					
+				}
 			}
         	
         });
@@ -63,16 +68,21 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				if (Core.instance().camera().direction == Direction.RIGHT)
-					Core.instance().camera().direction = Direction.DOWN;
-				else if (Core.instance().camera().direction == Direction.LEFT)
-					Core.instance().camera().direction = Direction.UP;
-				else if (Core.instance().camera().direction == Direction.UP)
-					Core.instance().camera().direction = Direction.RIGHT;
-				else if (Core.instance().camera().direction == Direction.DOWN)
-					Core.instance().camera().direction = Direction.LEFT;
 				
-				m_renderView.invalidate();
+				if (Core.instance().currentState() == Core.STATE_WALK_AROUND) {
+				
+					if (Core.instance().camera().direction == Direction.RIGHT)
+						Core.instance().camera().direction = Direction.DOWN;
+					else if (Core.instance().camera().direction == Direction.LEFT)
+						Core.instance().camera().direction = Direction.UP;
+					else if (Core.instance().camera().direction == Direction.UP)
+						Core.instance().camera().direction = Direction.RIGHT;
+					else if (Core.instance().camera().direction == Direction.DOWN)
+						Core.instance().camera().direction = Direction.LEFT;
+					
+					m_renderView.invalidate();
+					
+				}
 			}
         	
         });
@@ -83,24 +93,32 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				Core core = Core.instance();
 				
-				int tempX = core.camera().x;
-				int tempY = core.camera().y;
+				if (core.currentState() == Core.STATE_WALK_AROUND) {
 				
-				if (core.camera().direction == Direction.RIGHT)
-					core.camera().x++;
-				if (core.camera().direction == Direction.LEFT)
-					core.camera().x--;
-				if (core.camera().direction == Direction.UP)
-					core.camera().y--;
-				if (core.camera().direction == Direction.DOWN)
-					core.camera().y++;
-				
-				if (core.currentLevel().isSolid(core.camera().x, core.camera().y)) {
-					core.camera().x = tempX;
-					core.camera().y = tempY;
+					int tempX = core.camera().x;
+					int tempY = core.camera().y;
+					
+					if (core.camera().direction == Direction.RIGHT)
+						core.camera().x++;
+					if (core.camera().direction == Direction.LEFT)
+						core.camera().x--;
+					if (core.camera().direction == Direction.UP)
+						core.camera().y--;
+					if (core.camera().direction == Direction.DOWN)
+						core.camera().y++;
+					
+					if (core.currentLevel().isSolid(core.camera().x, core.camera().y)) {
+						core.camera().x = tempX;
+						core.camera().y = tempY;
+					}
+					
+					if (core.camera().x == 3 && core.camera().y == 2) {
+						core.startMessage("A test message.\nTest!");
+					}
+					
+					m_renderView.invalidate();
+					
 				}
-				
-				m_renderView.invalidate();
 			}
         	
         });
@@ -111,24 +129,28 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				Core core = Core.instance();
 				
-				int tempX = core.camera().x;
-				int tempY = core.camera().y;
+				if (core.currentState() == Core.STATE_WALK_AROUND) {
 				
-				if (core.camera().direction == Direction.RIGHT)
-					core.camera().x--;
-				if (core.camera().direction == Direction.LEFT)
-					core.camera().x++;
-				if (core.camera().direction == Direction.UP)
-					core.camera().y++;
-				if (core.camera().direction == Direction.DOWN)
-					core.camera().y--;
+					int tempX = core.camera().x;
+					int tempY = core.camera().y;
+					
+					if (core.camera().direction == Direction.RIGHT)
+						core.camera().x--;
+					if (core.camera().direction == Direction.LEFT)
+						core.camera().x++;
+					if (core.camera().direction == Direction.UP)
+						core.camera().y++;
+					if (core.camera().direction == Direction.DOWN)
+						core.camera().y--;
+					
+					if (core.currentLevel().isSolid(core.camera().x, core.camera().y)) {
+						core.camera().x = tempX;
+						core.camera().y = tempY;
+					}
+					
+					m_renderView.invalidate();
 				
-				if (core.currentLevel().isSolid(core.camera().x, core.camera().y)) {
-					core.camera().x = tempX;
-					core.camera().y = tempY;
 				}
-				
-				m_renderView.invalidate();
 			}
         	
         });
