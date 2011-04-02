@@ -1,5 +1,7 @@
 package com.redapplecandy.minirpg;
 
+import android.os.SystemClock;
+
 import com.redapplecandy.minirpg.character.Party;
 import com.redapplecandy.minirpg.maps.Level;
 import com.redapplecandy.minirpg.ui.MessageBox;
@@ -61,25 +63,8 @@ public class Core {
 		// TODO: Stuff that happens when the state changes.
 		
 		if (state == Core.STATE_SHOW_MESSAGE) {
-			Thread t = new Thread(
-				new Runnable() {
-
-					@Override
-					public synchronized void run() {
-						
-						while (!m_messageBox.done()) {
-							
-							m_messageBox.advance();
-							//	this.wait(200);
-							m_renderView.invalidate();
-							
-						}
-						Core.instance().setState(Core.STATE_WAIT_MESSAGE);
-						
-					}
-					
-				});
-			t.start();
+			m_messageBox.show(0, Config.MAIN_WINDOW_HEIGHT - Config.MESSAGE_BOX_HEIGHT);
+			setState(Core.STATE_WAIT_MESSAGE);
 		}
 		
 	}

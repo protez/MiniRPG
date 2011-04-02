@@ -16,28 +16,28 @@ public class MessageBox {
 	private int m_messageIndex = 0;
 	private int m_bufferIndex = 0;
 	
+	private int m_x, m_y;
+	
+	private boolean m_visible = false;
+	
 	public MessageBox() {
 		m_buffer = new String[4];
 		clear();
 	}
 	
-	public void advance() {
-		if (m_message.charAt(m_messageIndex) == '\n') {
-			m_bufferIndex++;
-			m_messageIndex++;
-			// Recursively call this to add the character after the
-			// newline.
-			advance();
-		} else {
-			m_buffer[m_bufferIndex] += m_message.charAt(m_messageIndex);
-			m_messageIndex++;
-		}
+	public void show(int x, int y) {
+		m_x = x;
+		m_y = y;
 		
-		/*
-		if (m_messageIndex == m_message.length()) {
-			Core.instance().setState(Core.STATE_WAIT_MESSAGE);
-		}
-		*/
+		m_visible = true;
+	}
+	
+	public void hide() {
+		m_visible = false;
+	}
+	
+	public boolean visible() {
+		return m_visible;
 	}
 	
 	public boolean done() {
@@ -51,7 +51,7 @@ public class MessageBox {
 			if (message.charAt(i) == '\n') {
 				m_bufferIndex++;
 			} else {
-				m_buffer[m_bufferIndex] += message.charAt(m_bufferIndex);
+				m_buffer[m_bufferIndex] += message.charAt(i);
 			}
 		}
 	}
@@ -69,15 +69,15 @@ public class MessageBox {
 		Paint paint = new Paint();
 		paint.setARGB(255, 255, 255, 255);
 		canvas.drawRect(
-			0, Config.MAIN_WINDOW_HEIGHT, 
-			Config.MAIN_WINDOW_WIDTH, Config.MAIN_WINDOW_HEIGHT + Config.MESSAGE_BOX_HEIGHT, 
+			m_x, m_y, 
+			Config.MAIN_WINDOW_WIDTH, m_y + Config.MESSAGE_BOX_HEIGHT, 
 			paint);
 		
 		Paint paint2 = new Paint();
 		paint2.setARGB(255, 0, 0, 0);
 		canvas.drawRect(
-			4, Config.MAIN_WINDOW_HEIGHT + 4, 
-			Config.MAIN_WINDOW_WIDTH - 4, Config.MAIN_WINDOW_HEIGHT + Config.MESSAGE_BOX_HEIGHT - 4, 
+			4 + m_x, m_y + 4, 
+			Config.MAIN_WINDOW_WIDTH - 4, m_y + Config.MESSAGE_BOX_HEIGHT - 4, 
 			paint2);
 		
 		Paint textPaint = new Paint();
@@ -85,8 +85,8 @@ public class MessageBox {
 		Typeface typeface = Typeface.create("Helvetica", Typeface.NORMAL);
 		textPaint.setTypeface(typeface);
 		for (int i = 0; i < m_buffer.length; i++) {
-			canvas.drawText(m_buffer[i], 8,
-				Config.MAIN_WINDOW_HEIGHT + i*16,
+			canvas.drawText(m_buffer[i], m_x + 8,
+				m_y + (i+1)*16,
 				textPaint);
 		}
 	}

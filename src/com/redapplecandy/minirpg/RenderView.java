@@ -68,8 +68,6 @@ public class RenderView extends View implements OnTouchListener {
 		
 		StatusText.draw(canvas);
 		
-		core.getMessageBox().draw(canvas);
-		
 		for (InvisibleButton b : m_buttons) {
 		//	b.debugDraw(canvas);
 		}
@@ -78,6 +76,10 @@ public class RenderView extends View implements OnTouchListener {
 		characterWidget2.draw(canvas);
 		characterWidget3.draw(canvas);
 		characterWidget4.draw(canvas);
+		
+		if (core.getMessageBox().visible()) {
+			core.getMessageBox().draw(canvas);
+		}
 	}
 	
 	/*
@@ -119,6 +121,9 @@ public class RenderView extends View implements OnTouchListener {
 				// TODO: The state to change to will depend on a number of things
 				// later (a saved state? We'll see...).
 				Core.instance().setState(Core.STATE_WALK_AROUND);
+				Core.instance().getMessageBox().hide();
+				
+				this.invalidate();
 			}
 		}
 		

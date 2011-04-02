@@ -22,10 +22,10 @@ public class CharacterWidget extends InvisibleButton {
 	 * @param chr
 	 * @param x
 	 * @param y	This will automatically be scaled to be placed under the main
-	 * 			window and message box.
+	 * 			window.
 	 */
 	public CharacterWidget(PlayerCharacter chr, int x, int y) {
-		super(x, y + Config.MAIN_WINDOW_HEIGHT + Config.MESSAGE_BOX_HEIGHT + 4, 0, 72, 60);
+		super(x, y + Config.MAIN_WINDOW_HEIGHT + 4, 0, 72, 60);
 		m_chr = chr;
 	}
 	
