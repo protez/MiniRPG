@@ -2,7 +2,7 @@ package com.redapplecandy.minirpg.maps;
 
 import java.util.Vector;
 
-import com.redapplecandy.minirpg.Camera;
+import com.redapplecandy.minirpg.SimpleCamera;
 import com.redapplecandy.minirpg.Config;
 import com.redapplecandy.minirpg.Direction;
 import com.redapplecandy.minirpg.TileManager;
@@ -50,7 +50,7 @@ public class Level {
 		m_wallFeatures.add(wf);
 	}
 	
-	public void draw(Canvas canvas, Camera src) {
+	public void draw(Canvas canvas, SimpleCamera src) {
 		Vector<Integer> visibleNear = getVisibleNearTiles(src.x, src.y, src.direction);
 		
 		TileManager tileManager = TileManager.instance();

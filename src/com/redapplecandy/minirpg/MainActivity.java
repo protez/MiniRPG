@@ -1,5 +1,7 @@
 package com.redapplecandy.minirpg;
 
+import com.redapplecandy.minirpg.graphics.Raycaster;
+import com.redapplecandy.minirpg.math.Vec2;
 import com.redapplecandy.minirpg.ui.InvisibleButton;
 
 import android.app.Activity;
@@ -27,6 +29,7 @@ public class MainActivity extends Activity {
         BitmapLoader.instance().setContext(this);
         TileManager.instance();
         
+        m_renderView.raycaster = new Raycaster(Config.MAIN_WINDOW_WIDTH, 200);
         Core.instance().setRenderView(m_renderView);
         
         //m_renderView.createFeature();
@@ -47,16 +50,25 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
+				Core core = Core.instance();				
 				if (Core.instance().currentState() == Core.STATE_WALK_AROUND) {
-				
-					if (Core.instance().camera().direction == Direction.RIGHT)
-						Core.instance().camera().direction = Direction.UP;
-					else if (Core.instance().camera().direction == Direction.LEFT)
-						Core.instance().camera().direction = Direction.DOWN;
-					else if (Core.instance().camera().direction == Direction.UP)
-						Core.instance().camera().direction = Direction.LEFT;
-					else if (Core.instance().camera().direction == Direction.DOWN)
-						Core.instance().camera().direction = Direction.RIGHT;
+				/*
+					if (Core.instance().getSimpleCamera().direction == Direction.RIGHT)
+						Core.instance().getSimpleCamera().direction = Direction.UP;
+					else if (Core.instance().getSimpleCamera().direction == Direction.LEFT)
+						Core.instance().getSimpleCamera().direction = Direction.DOWN;
+					else if (Core.instance().getSimpleCamera().direction == Direction.UP)
+						Core.instance().getSimpleCamera().direction = Direction.LEFT;
+					else if (Core.instance().getSimpleCamera().direction == Direction.DOWN)
+						Core.instance().getSimpleCamera().direction = Direction.RIGHT;
+				*/	
+					Vec2 dir = core.camera().dir.clone();
+					Vec2 plane = core.camera().plane.clone();
+					
+					core.camera().dir.x = (float) (dir.x * Math.cos(0.087) - dir.y * Math.sin(0.087));
+					core.camera().dir.y = (float) (dir.x * Math.sin(0.087) + dir.y * Math.cos(0.087));
+					core.camera().plane.x = (float) (plane.x * Math.cos(0.087) - plane.y * Math.sin(0.087));
+					core.camera().plane.y = (float) (plane.x * Math.sin(0.087) + plane.y * Math.cos(0.087));
 					
 					m_renderView.invalidate();
 					
@@ -69,16 +81,25 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
+				Core core = Core.instance();				
 				if (Core.instance().currentState() == Core.STATE_WALK_AROUND) {
-				
-					if (Core.instance().camera().direction == Direction.RIGHT)
-						Core.instance().camera().direction = Direction.DOWN;
-					else if (Core.instance().camera().direction == Direction.LEFT)
-						Core.instance().camera().direction = Direction.UP;
-					else if (Core.instance().camera().direction == Direction.UP)
-						Core.instance().camera().direction = Direction.RIGHT;
-					else if (Core.instance().camera().direction == Direction.DOWN)
-						Core.instance().camera().direction = Direction.LEFT;
+				/*
+					if (Core.instance().getSimpleCamera().direction == Direction.RIGHT)
+						Core.instance().getSimpleCamera().direction = Direction.DOWN;
+					else if (Core.instance().getSimpleCamera().direction == Direction.LEFT)
+						Core.instance().getSimpleCamera().direction = Direction.UP;
+					else if (Core.instance().getSimpleCamera().direction == Direction.UP)
+						Core.instance().getSimpleCamera().direction = Direction.RIGHT;
+					else if (Core.instance().getSimpleCamera().direction == Direction.DOWN)
+						Core.instance().getSimpleCamera().direction = Direction.LEFT;
+				*/	
+					Vec2 dir = core.camera().dir.clone();
+					Vec2 plane = core.camera().plane.clone();
+					
+					core.camera().dir.x = (float) (dir.x * Math.cos(-0.087) - dir.y * Math.sin(-0.087));
+					core.camera().dir.y = (float) (dir.x * Math.sin(-0.087) + dir.y * Math.cos(-0.087));
+					core.camera().plane.x = (float) (plane.x * Math.cos(-0.087) - plane.y * Math.sin(-0.087));
+					core.camera().plane.y = (float) (plane.x * Math.sin(-0.087) + plane.y * Math.cos(-0.087));
 					
 					m_renderView.invalidate();
 					
@@ -94,27 +115,31 @@ public class MainActivity extends Activity {
 				Core core = Core.instance();
 				
 				if (core.currentState() == Core.STATE_WALK_AROUND) {
-				
-					int tempX = core.camera().x;
-					int tempY = core.camera().y;
+					/*
+					int tempX = core.getSimpleCamera().x;
+					int tempY = core.getSimpleCamera().y;
 					
-					if (core.camera().direction == Direction.RIGHT)
-						core.camera().x++;
-					if (core.camera().direction == Direction.LEFT)
-						core.camera().x--;
-					if (core.camera().direction == Direction.UP)
-						core.camera().y--;
-					if (core.camera().direction == Direction.DOWN)
-						core.camera().y++;
+					if (core.getSimpleCamera().direction == Direction.RIGHT)
+						core.getSimpleCamera().x++;
+					if (core.getSimpleCamera().direction == Direction.LEFT)
+						core.getSimpleCamera().x--;
+					if (core.getSimpleCamera().direction == Direction.UP)
+						core.getSimpleCamera().y--;
+					if (core.getSimpleCamera().direction == Direction.DOWN)
+						core.getSimpleCamera().y++;
 					
-					if (core.currentLevel().isSolid(core.camera().x, core.camera().y)) {
-						core.camera().x = tempX;
-						core.camera().y = tempY;
+					if (core.currentLevel().isSolid(core.getSimpleCamera().x, core.getSimpleCamera().y)) {
+						core.getSimpleCamera().x = tempX;
+						core.getSimpleCamera().y = tempY;
 					}
 					
-					if (core.camera().x == 3 && core.camera().y == 2) {
+					if (core.getSimpleCamera().x == 3 && core.getSimpleCamera().y == 2) {
 						core.startMessage("A test message.\nTest!");
 					}
+					*/
+					
+					core.camera().pos.x += core.camera().dir.x * 0.05;
+					core.camera().pos.y += core.camera().dir.y * 0.05;
 					
 					m_renderView.invalidate();
 					
@@ -130,23 +155,27 @@ public class MainActivity extends Activity {
 				Core core = Core.instance();
 				
 				if (core.currentState() == Core.STATE_WALK_AROUND) {
-				
-					int tempX = core.camera().x;
-					int tempY = core.camera().y;
+					/*
+					int tempX = core.getSimpleCamera().x;
+					int tempY = core.getSimpleCamera().y;
 					
-					if (core.camera().direction == Direction.RIGHT)
-						core.camera().x--;
-					if (core.camera().direction == Direction.LEFT)
-						core.camera().x++;
-					if (core.camera().direction == Direction.UP)
-						core.camera().y++;
-					if (core.camera().direction == Direction.DOWN)
-						core.camera().y--;
+					if (core.getSimpleCamera().direction == Direction.RIGHT)
+						core.getSimpleCamera().x--;
+					if (core.getSimpleCamera().direction == Direction.LEFT)
+						core.getSimpleCamera().x++;
+					if (core.getSimpleCamera().direction == Direction.UP)
+						core.getSimpleCamera().y++;
+					if (core.getSimpleCamera().direction == Direction.DOWN)
+						core.getSimpleCamera().y--;
 					
-					if (core.currentLevel().isSolid(core.camera().x, core.camera().y)) {
-						core.camera().x = tempX;
-						core.camera().y = tempY;
+					if (core.currentLevel().isSolid(core.getSimpleCamera().x, core.getSimpleCamera().y)) {
+						core.getSimpleCamera().x = tempX;
+						core.getSimpleCamera().y = tempY;
 					}
+					*/
+					
+					core.camera().pos.x -= core.camera().dir.x * 0.05;
+					core.camera().pos.y -= core.camera().dir.y * 0.05;
 					
 					m_renderView.invalidate();
 				

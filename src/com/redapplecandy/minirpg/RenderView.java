@@ -3,6 +3,7 @@ package com.redapplecandy.minirpg;
 import java.util.Vector;
 
 import com.redapplecandy.minirpg.character.PlayerCharacter;
+import com.redapplecandy.minirpg.graphics.Raycaster;
 import com.redapplecandy.minirpg.ui.CharacterWidget;
 import com.redapplecandy.minirpg.ui.InvisibleButton;
 import com.redapplecandy.minirpg.ui.MessageBox;
@@ -30,6 +31,8 @@ public class RenderView extends View implements OnTouchListener {
 	CharacterWidget characterWidget3 = new CharacterWidget(testCharacter, 152, 0);
 	CharacterWidget characterWidget4 = new CharacterWidget(testCharacter, 228, 0);
 	
+	public Raycaster raycaster;
+	
 	public RenderView(Context context) {
 		super(context);
 		
@@ -47,7 +50,8 @@ public class RenderView extends View implements OnTouchListener {
 		canvas.drawARGB(255, 0, 0, 0);
 		
 		Core core = Core.instance();
-		Camera camera = core.camera();
+		/*
+		SimpleCamera camera = core.getSimpleCamera();
 		core.currentLevel().draw(canvas, camera);
 		
 		Paint paint = new Paint();
@@ -65,6 +69,9 @@ public class RenderView extends View implements OnTouchListener {
 			canvas.drawLine(camera.x*8+4, camera.y*8+4, camera.x*8+4, camera.y*8+4+4, paint2);
 		
 		core.currentLevel().drawMiniMap(canvas);
+		*/
+		
+		raycaster.draw(core.camera(), canvas);
 		
 		StatusText.draw(canvas);
 		

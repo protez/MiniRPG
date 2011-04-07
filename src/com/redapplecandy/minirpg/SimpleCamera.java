@@ -5,15 +5,15 @@ package com.redapplecandy.minirpg;
  * and a direction.
  * @author tomas
  */
-public class Camera {
+public class SimpleCamera {
 
 	public int x, y, direction;
 	
-	public Camera() {
+	public SimpleCamera() {
 		this(0, 0, Direction.RIGHT);
 	}
 	
-	public Camera(int x, int y, int direction) {
+	public SimpleCamera(int x, int y, int direction) {
 		this.x = x;
 		this.y = y;
 		this.direction = direction;

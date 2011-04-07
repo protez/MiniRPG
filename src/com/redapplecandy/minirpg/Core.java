@@ -3,7 +3,9 @@ package com.redapplecandy.minirpg;
 import android.os.SystemClock;
 
 import com.redapplecandy.minirpg.character.Party;
+import com.redapplecandy.minirpg.graphics.Camera;
 import com.redapplecandy.minirpg.maps.Level;
+import com.redapplecandy.minirpg.math.Vec2;
 import com.redapplecandy.minirpg.ui.MessageBox;
 
 public class Core {
@@ -26,12 +28,17 @@ public class Core {
 	private Party m_playerParty;
 	
 	private Camera m_camera;
+	
+	private SimpleCamera m_simpleCamera;
 	private Level m_currentLevel;
 	
 	private MessageBox m_messageBox = new MessageBox();
 	
 	private Core() {
-		m_camera = new Camera(2, 2, Direction.RIGHT);
+		m_simpleCamera = new SimpleCamera(2, 2, Direction.RIGHT);
+		
+		m_camera = new Camera(new Vec2(4, 4), new Vec2(-1, 0), new Vec2(0, 0.66f));
+		
 		m_currentLevel = new Level();
 	}
 	
@@ -52,6 +59,10 @@ public class Core {
 	
 	public Level currentLevel() {
 		return m_currentLevel;
+	}
+	
+	public SimpleCamera getSimpleCamera() {
+		return m_simpleCamera;
 	}
 	
 	public Camera camera() {
