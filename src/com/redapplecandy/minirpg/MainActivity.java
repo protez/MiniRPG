@@ -21,6 +21,12 @@ public class MainActivity extends Activity {
 	InvisibleButton m_turnLeft;
 	InvisibleButton m_turnRight;
 	
+	static {
+		System.err.println("*** LOADING LIBRARY!!!");
+		System.loadLibrary("raycaster");
+		System.err.println("*** LIBRARY LOADED!!!!!");
+	}
+	
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);

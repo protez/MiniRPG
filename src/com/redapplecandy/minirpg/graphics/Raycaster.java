@@ -4,6 +4,7 @@ import com.redapplecandy.minirpg.BitmapLoader;
 import com.redapplecandy.minirpg.Config;
 import com.redapplecandy.minirpg.R;
 import com.redapplecandy.minirpg.math.Vec2;
+import com.redapplecandy.minirpg.util.ArrayUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -48,10 +49,19 @@ public class Raycaster {
 	
 	public void draw(Camera camera, Canvas canvas) {
 		m_target.eraseColor(0);
-		raycast(camera);
+		//raycast(camera);
+		raycast(m_target, m_wallTexture, m_floorTexture, 
+			ArrayUtils.flattenIntMatrix(m_tileMap), m_tileMap.length, m_tileMap[0].length,
+			camera.pos.x, camera.pos.y, camera.dir.x, camera.dir.y, camera.plane.x, camera.plane.y);
 		canvas.drawBitmap(m_target, 0, 0, null);
 	}
 	
+	private static native void raycast(
+		Bitmap bitmap, Bitmap wallTexture, Bitmap floorTexture, int[] _tileMap,
+		int width, int height, float camX, float camY, float camDirX,
+		float camDirY, float camPlaneX, float camPlaneY);
+	
+	/*
 	public void raycast(Camera camera) {
 		
 		for (int x = 0; x < m_width; x++) {
@@ -80,7 +90,7 @@ public class Raycaster {
 				m_target.setPixel(x, y, color);
 			}
 		
-			/*
+			
 			if (wallEnd < 0) {
 				wallEnd = m_height;
 			}
@@ -105,7 +115,7 @@ public class Raycaster {
 				// Ceiling
 				m_target.setPixel(x, m_height - y, color);
 			}
-			*/
+			
 		}
 		
 	}
@@ -209,5 +219,5 @@ public class Raycaster {
 		
 		return info;
 	}
-	
+	*/
 }

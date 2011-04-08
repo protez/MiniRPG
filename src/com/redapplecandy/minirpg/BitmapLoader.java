@@ -5,6 +5,7 @@ import java.io.InputStream;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 
 public class BitmapLoader {
 
@@ -29,8 +30,11 @@ public class BitmapLoader {
 	public Bitmap loadById(int id) {
 		InputStream is = m_context.getResources().openRawResource(id);
 		Bitmap bmp = BitmapFactory.decodeStream(is);
+		Bitmap bmp565 = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Bitmap.Config.RGB_565);
 		
-		return bmp;
+		bmp565 = bmp.copy(Bitmap.Config.RGB_565, true);
+		
+		return bmp565;
 	}
 	
 }
