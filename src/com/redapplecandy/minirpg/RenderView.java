@@ -14,6 +14,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
@@ -21,8 +23,93 @@ import android.view.View.OnTouchListener;
  * Renders the game. I'm using this as a testclass for everything atm.
  * @author tomas
  */
-public class RenderView extends View implements OnTouchListener {
+public class RenderView extends SurfaceView implements OnTouchListener, SurfaceHolder.Callback {
 
+	private class GameThread extends Thread {
+		private SurfaceHolder m_surfaceHolder;
+		private boolean m_running = true;
+		private Core m_core;
+		
+		public GameThread(SurfaceHolder surfaceHolder) {
+			m_surfaceHolder = surfaceHolder;
+			m_core = Core.instance();
+		}
+		
+		public void run() {
+			while (m_running) {
+				Canvas canvas = null;
+				
+				update();
+				
+				try {
+					canvas = m_surfaceHolder.lockCanvas(null);
+					synchronized(m_surfaceHolder) {
+						draw(canvas);
+					}
+				} finally {
+					if (canvas != null) {
+						m_surfaceHolder.unlockCanvasAndPost(canvas);
+					}
+				}
+			}
+		}
+		
+		public void update() {
+			if (m_core.currentState() == Core.STATE_TURNING) {
+				m_core.incAngle();
+			} else if (m_core.currentState() == Core.STATE_MOVING) {
+				m_core.incStep();
+			}
+		}
+		
+		public void end() {
+			m_running = false;
+		}
+		
+		public void draw(Canvas canvas) {
+			canvas.drawARGB(255, 0, 0, 0);
+			
+			Core core = Core.instance();
+			/*
+			SimpleCamera camera = core.getSimpleCamera();
+			core.currentLevel().draw(canvas, camera);
+			
+			Paint paint = new Paint();
+			paint.setARGB(255, 0, 255, 255);
+			canvas.drawRect(camera.x*8, camera.y*8, camera.x*8+8, camera.y*8+8, paint);
+			Paint paint2 = new Paint();
+			paint.setARGB(255, 0, 0, 0);
+			if (camera.direction == Direction.RIGHT)
+				canvas.drawLine(camera.x*8+4, camera.y*8+4, camera.x*8+4+4, camera.y*8+4, paint2);
+			if (camera.direction == Direction.LEFT)
+				canvas.drawLine(camera.x*8+4, camera.y*8+4, camera.x*8+4-4, camera.y*8+4, paint2);
+			if (camera.direction == Direction.UP)
+				canvas.drawLine(camera.x*8+4, camera.y*8+4, camera.x*8+4, camera.y*8+4-4, paint2);
+			if (camera.direction == Direction.DOWN)
+				canvas.drawLine(camera.x*8+4, camera.y*8+4, camera.x*8+4, camera.y*8+4+4, paint2);
+			
+			core.currentLevel().drawMiniMap(canvas);
+			*/
+			
+			raycaster.draw(core.camera(), canvas);
+			
+			StatusText.draw(canvas);
+			
+			for (InvisibleButton b : m_buttons) {
+			//	b.debugDraw(canvas);
+			}
+			
+			characterWidget.draw(canvas);
+			characterWidget2.draw(canvas);
+			characterWidget3.draw(canvas);
+			characterWidget4.draw(canvas);
+			
+			if (core.getMessageBox().visible()) {
+				core.getMessageBox().draw(canvas);
+			}
+		}
+	}
+	
 	Vector<InvisibleButton> m_buttons = new Vector<InvisibleButton>();
 	
 	PlayerCharacter testCharacter = PlayerCharacter.createTestCharacter();
@@ -33,6 +120,9 @@ public class RenderView extends View implements OnTouchListener {
 	
 	public Raycaster raycaster;
 	
+	
+	private GameThread m_gameThread;
+	
 	public RenderView(Context context) {
 		super(context);
 		
@@ -42,51 +132,16 @@ public class RenderView extends View implements OnTouchListener {
 	public RenderView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
+		SurfaceHolder holder = this.getHolder();
+		holder.addCallback(this);
+		m_gameThread = new GameThread(holder);
+		
+		
 		setOnTouchListener(this);
 	}
 	
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		canvas.drawARGB(255, 0, 0, 0);
-		
-		Core core = Core.instance();
-		/*
-		SimpleCamera camera = core.getSimpleCamera();
-		core.currentLevel().draw(canvas, camera);
-		
-		Paint paint = new Paint();
-		paint.setARGB(255, 0, 255, 255);
-		canvas.drawRect(camera.x*8, camera.y*8, camera.x*8+8, camera.y*8+8, paint);
-		Paint paint2 = new Paint();
-		paint.setARGB(255, 0, 0, 0);
-		if (camera.direction == Direction.RIGHT)
-			canvas.drawLine(camera.x*8+4, camera.y*8+4, camera.x*8+4+4, camera.y*8+4, paint2);
-		if (camera.direction == Direction.LEFT)
-			canvas.drawLine(camera.x*8+4, camera.y*8+4, camera.x*8+4-4, camera.y*8+4, paint2);
-		if (camera.direction == Direction.UP)
-			canvas.drawLine(camera.x*8+4, camera.y*8+4, camera.x*8+4, camera.y*8+4-4, paint2);
-		if (camera.direction == Direction.DOWN)
-			canvas.drawLine(camera.x*8+4, camera.y*8+4, camera.x*8+4, camera.y*8+4+4, paint2);
-		
-		core.currentLevel().drawMiniMap(canvas);
-		*/
-		
-		raycaster.draw(core.camera(), canvas);
-		
-		StatusText.draw(canvas);
-		
-		for (InvisibleButton b : m_buttons) {
-		//	b.debugDraw(canvas);
-		}
-		
-		characterWidget.draw(canvas);
-		characterWidget2.draw(canvas);
-		characterWidget3.draw(canvas);
-		characterWidget4.draw(canvas);
-		
-		if (core.getMessageBox().visible()) {
-			core.getMessageBox().draw(canvas);
-		}
 	}
 	
 	/*
@@ -139,6 +194,28 @@ public class RenderView extends View implements OnTouchListener {
 	
 	public void addButton(InvisibleButton b) {
 		m_buttons.add(b);
+	}
+
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width,
+			int height) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		m_gameThread.start();
+	}
+
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		m_gameThread.end();
+		try {
+			m_gameThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

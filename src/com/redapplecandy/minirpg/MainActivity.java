@@ -68,6 +68,7 @@ public class MainActivity extends Activity {
 					else if (Core.instance().getSimpleCamera().direction == Direction.DOWN)
 						Core.instance().getSimpleCamera().direction = Direction.RIGHT;
 				*/	
+					/*
 					Vec2 dir = core.camera().dir.clone();
 					Vec2 plane = core.camera().plane.clone();
 					
@@ -75,9 +76,9 @@ public class MainActivity extends Activity {
 					core.camera().dir.y = (float) (dir.x * Math.sin(0.087) + dir.y * Math.cos(0.087));
 					core.camera().plane.x = (float) (plane.x * Math.cos(0.087) - plane.y * Math.sin(0.087));
 					core.camera().plane.y = (float) (plane.x * Math.sin(0.087) + plane.y * Math.cos(0.087));
-					
-					m_renderView.invalidate();
-					
+					*/
+					//m_renderView.invalidate();
+					core.turn(90, 5);
 				}
 			}
         	
@@ -99,6 +100,7 @@ public class MainActivity extends Activity {
 					else if (Core.instance().getSimpleCamera().direction == Direction.DOWN)
 						Core.instance().getSimpleCamera().direction = Direction.LEFT;
 				*/	
+					/*
 					Vec2 dir = core.camera().dir.clone();
 					Vec2 plane = core.camera().plane.clone();
 					
@@ -106,9 +108,9 @@ public class MainActivity extends Activity {
 					core.camera().dir.y = (float) (dir.x * Math.sin(-0.087) + dir.y * Math.cos(-0.087));
 					core.camera().plane.x = (float) (plane.x * Math.cos(-0.087) - plane.y * Math.sin(-0.087));
 					core.camera().plane.y = (float) (plane.x * Math.sin(-0.087) + plane.y * Math.cos(-0.087));
-					
-					m_renderView.invalidate();
-					
+					*/
+					//m_renderView.invalidate();
+					core.turn(-90, -5);
 				}
 			}
         	
@@ -144,10 +146,11 @@ public class MainActivity extends Activity {
 					}
 					*/
 					
-					core.camera().pos.x += core.camera().dir.x * 0.05;
-					core.camera().pos.y += core.camera().dir.y * 0.05;
+					//core.camera().pos.x += core.camera().dir.x;// * 0.05;
+					//core.camera().pos.y += core.camera().dir.y;// * 0.05;
+					core.step(0.1f);
 					
-					m_renderView.invalidate();
+					//m_renderView.invalidate();
 					
 				}
 			}
@@ -180,10 +183,12 @@ public class MainActivity extends Activity {
 					}
 					*/
 					
-					core.camera().pos.x -= core.camera().dir.x * 0.05;
-					core.camera().pos.y -= core.camera().dir.y * 0.05;
+					//core.camera().pos.x -= core.camera().dir.x;// * 0.05;
+					//core.camera().pos.y -= core.camera().dir.y;// * 0.05;
 					
-					m_renderView.invalidate();
+					core.step(-0.1f);
+					
+					//m_renderView.invalidate();
 				
 				}
 			}
