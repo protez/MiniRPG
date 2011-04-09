@@ -19,4 +19,6 @@ public class Config {
 	//public static final int MIDDLE_TILE_POS = 96;
 	
 	public static final int TEXTURE_SIZE = 64;
+	
+	public static final long FPS = 60;
 }

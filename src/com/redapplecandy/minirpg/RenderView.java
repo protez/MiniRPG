@@ -12,6 +12,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -30,16 +31,25 @@ public class RenderView extends SurfaceView implements OnTouchListener, SurfaceH
 		private boolean m_running = true;
 		private Core m_core;
 		
+		private long m_timerThen;
+		
 		public GameThread(SurfaceHolder surfaceHolder) {
 			m_surfaceHolder = surfaceHolder;
 			m_core = Core.instance();
+			
+			m_timerThen = SystemClock.currentThreadTimeMillis();
 		}
 		
 		public void run() {
 			while (m_running) {
 				Canvas canvas = null;
 				
-				update();
+				long timerNow = SystemClock.currentThreadTimeMillis();
+				
+				while (m_timerThen < timerNow) {
+					update();
+					m_timerThen += 1000 / Config.FPS;
+				}
 				
 				try {
 					canvas = m_surfaceHolder.lockCanvas(null);
@@ -51,6 +61,8 @@ public class RenderView extends SurfaceView implements OnTouchListener, SurfaceH
 						m_surfaceHolder.unlockCanvasAndPost(canvas);
 					}
 				}
+				
+				SystemClock.sleep(m_timerThen - timerNow);
 			}
 		}
 		
