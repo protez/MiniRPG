@@ -125,7 +125,7 @@ public class Core {
 		
 		m_camera.pos.x += m_camera.dir.x * m_walkSpeed;
 		m_camera.pos.y += m_camera.dir.y * m_walkSpeed;
-		m_walkAccumulator += m_walkSpeed;
+		m_walkAccumulator += Math.abs(m_walkSpeed);
 		
 		//if (m_targetPos.equals(m_camera.pos)) {
 		if (m_walkAccumulator >= 1) {
