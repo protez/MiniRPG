@@ -44,9 +44,23 @@ public class MessageBox {
 		return m_messageIndex == m_message.length();
 	}
 	
+	public void advance() {
+		if (done()) return;
+		
+		if (m_message.charAt(m_messageIndex) == '\n') {
+			m_bufferIndex++;
+			m_messageIndex++;
+			advance();
+		} else {
+			m_buffer[m_bufferIndex] += m_message.charAt(m_messageIndex);
+			m_messageIndex++;
+		}
+	}
+	
 	public void setMessage(String message) {
 		clear();
 		m_message = message;
+		/*
 		for (int i = 0; i < message.length(); i++) {
 			if (message.charAt(i) == '\n') {
 				m_bufferIndex++;
@@ -54,6 +68,7 @@ public class MessageBox {
 				m_buffer[m_bufferIndex] += message.charAt(i);
 			}
 		}
+		*/
 	}
 	
 	public void clear() {

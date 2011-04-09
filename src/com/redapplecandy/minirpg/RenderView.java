@@ -67,10 +67,13 @@ public class RenderView extends SurfaceView implements OnTouchListener, SurfaceH
 		}
 		
 		public void update() {
+			// Maybe put this if-statement in core ;-)
 			if (m_core.currentState() == Core.STATE_TURNING) {
 				m_core.incAngle();
 			} else if (m_core.currentState() == Core.STATE_MOVING) {
 				m_core.incStep();
+			} else if (m_core.currentState() == Core.STATE_WAIT_MESSAGE) {
+				m_core.advanceMessage();
 			}
 		}
 		

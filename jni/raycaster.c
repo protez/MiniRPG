@@ -238,7 +238,7 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 	 jintArray _tileMap, jint width, jint height,
 	 jfloat camX, jfloat camY, jfloat camDirX, jfloat camDirY, jfloat camPlaneX, jfloat camPlaneY)
 {
-	LOGE("*** RAYCAST ***");
+//	LOGE("*** RAYCAST ***");
 	AndroidBitmapInfo bitmapInfo;
 	AndroidBitmapInfo floorTextureInfo;
 	AndroidBitmapInfo wallTextureInfo;
@@ -246,7 +246,7 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 	void* wallPixels;
 	void* floorPixels;
 
-	LOGE("*** GETTING BITMAP INFO ***");	
+//	LOGE("*** GETTING BITMAP INFO ***");	
 	AndroidBitmap_getInfo(env, bitmap, &bitmapInfo);
 	AndroidBitmap_getInfo(env, wallTexture, &wallTextureInfo);
 	AndroidBitmap_getInfo(env, floorTexture, &floorTextureInfo);
@@ -300,11 +300,11 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 		return;
 	}
 	
-	LOGE("*** LOCKING PIXELS .... ***");	
+//	LOGE("*** LOCKING PIXELS .... ***");	
 	AndroidBitmap_lockPixels(env, bitmap, &pixels);
 	AndroidBitmap_lockPixels(env, wallTexture, &wallPixels);
 	AndroidBitmap_lockPixels(env, floorTexture, &floorPixels);
-	LOGE("*** ... PIXELS LOCKED ***");	
+//	LOGE("*** ... PIXELS LOCKED ***");	
 	
 	Camera camera = { 
 		{camX, camY}, 
@@ -315,25 +315,24 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 	mapWidth = width;
 	mapHeight = height;
 	
-	LOGE("***  GETTING INT ARRAY ELEMENTS ***");
+//	LOGE("***  GETTING INT ARRAY ELEMENTS ***");
 	jint* tileMap = (*env)->GetIntArrayElements(env, _tileMap, NULL);
 
-	LOGE("***  CALLING RAYCAST ***");	
+//	LOGE("***  CALLING RAYCAST ***");	
 	raycast(camera, 
 		&bitmapInfo, pixels, 
 		&wallTextureInfo, wallPixels, 
 		&floorTextureInfo, floorPixels,
 		tileMap);
 
-	LOGE("***  UNLOCKING PIXELS ***");
-	LOGE("***  im gay ***");
+//	LOGE("***  UNLOCKING PIXELS ***");
 	
 	AndroidBitmap_unlockPixels(env, floorTexture);
 	AndroidBitmap_unlockPixels(env, wallTexture);	
 	AndroidBitmap_unlockPixels(env, bitmap);
 	
-	LOGE("*** RELEASING ARRAY ***");
+//	LOGE("*** RELEASING ARRAY ***");
 	(*env)->ReleaseIntArrayElements(env, _tileMap, tileMap, 0);
 	
-	LOGE("*** ALL DONE ***");
+//	LOGE("*** ALL DONE ***");
 }

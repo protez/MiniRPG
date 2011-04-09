@@ -17,7 +17,8 @@ public class Core {
 		STATE_WAIT_MESSAGE = 2,
 		STATE_CHARACTER_SHEET = 3,
 		STATE_MOVING = 4,
-		STATE_TURNING = 5;
+		STATE_TURNING = 5,
+		STATE_PAUSE_MESSAGE = 6;
 	
 	private int m_accumulatedAngle = 0;
 	private int m_angleTarget = 0;
@@ -103,6 +104,14 @@ public class Core {
 	public void startMessage(String message) {
 		m_messageBox.setMessage(message);
 		setState(Core.STATE_SHOW_MESSAGE);
+	}
+	
+	public void advanceMessage() {
+		m_messageBox.advance();
+		if (m_messageBox.done()) {
+			// Should probably restore a saved state here.
+			setState(Core.STATE_WAIT_MESSAGE);
+		}
 	}
 	
 	public void step(float speed) {
