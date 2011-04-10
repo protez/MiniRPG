@@ -25,7 +25,7 @@ public class CharacterWidget extends InvisibleButton {
 	 * 			window.
 	 */
 	public CharacterWidget(PlayerCharacter chr, int x, int y) {
-		super(x, y + Config.MAIN_WINDOW_HEIGHT + 4, 0, 72, 60);
+		super(x, y + Config.STATUS_BAR_POS + 4, 80, 60);
 		m_chr = chr;
 	}
 	

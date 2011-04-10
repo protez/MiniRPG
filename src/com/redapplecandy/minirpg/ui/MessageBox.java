@@ -85,14 +85,14 @@ public class MessageBox {
 		paint.setARGB(255, 255, 255, 255);
 		canvas.drawRect(
 			m_x, m_y, 
-			Config.MAIN_WINDOW_WIDTH, m_y + Config.MESSAGE_BOX_HEIGHT, 
+			m_x + Config.MAIN_WINDOW_WIDTH, m_y + Config.MESSAGE_BOX_HEIGHT, 
 			paint);
 		
 		Paint paint2 = new Paint();
 		paint2.setARGB(255, 0, 0, 0);
 		canvas.drawRect(
 			4 + m_x, m_y + 4, 
-			Config.MAIN_WINDOW_WIDTH - 4, m_y + Config.MESSAGE_BOX_HEIGHT - 4, 
+			m_x + Config.MAIN_WINDOW_WIDTH - 4, m_y + Config.MESSAGE_BOX_HEIGHT - 4, 
 			paint2);
 		
 		Paint textPaint = new Paint();

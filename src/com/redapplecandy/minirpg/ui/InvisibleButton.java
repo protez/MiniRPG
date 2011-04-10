@@ -30,13 +30,12 @@ public class InvisibleButton {
 		this(x, y, padding);
 		m_width = w;
 		m_height = h;
-		/*
-		debugColor = debugColors[debugColorIndex];
-		debugColorIndex++;
-		if (debugColorIndex > debugColors.length) {
-			debugColorIndex = 0;
-		}
-		*/
+	}
+	
+	public InvisibleButton(int x, int y, int w, int h) {
+		this(x, y, 0);
+		m_width = w;
+		m_height = h;
 	}
 	
 	public int x() {
@@ -71,11 +70,7 @@ public class InvisibleButton {
 	public void setOnClickListener(OnClickListener listener) {
 		m_clickListener = listener;
 	}
-	/*
-	private static int[] debugColors = {0xffff0000, 0xff00ff00, 0xff0000ff, 0xffffff00 };
-	private static int debugColorIndex = 0;
-	private int debugColor;
-	*/
+
 	public void debugDraw(Canvas canvas) {
 		Paint paint = new Paint();
 		paint.setColor(0xffff0000);

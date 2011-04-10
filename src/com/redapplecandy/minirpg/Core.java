@@ -85,11 +85,12 @@ public class Core {
 		m_currentState = state;
 		// TODO: Stuff that happens when the state changes.
 		
+		/*
 		if (state == Core.STATE_SHOW_MESSAGE) {
-			m_messageBox.show(0, Config.MAIN_WINDOW_HEIGHT - Config.MESSAGE_BOX_HEIGHT);
+			
 			setState(Core.STATE_WAIT_MESSAGE);
 		}
-		
+		*/
 	}
 	
 	public int currentState() {
@@ -103,6 +104,7 @@ public class Core {
 	
 	public void startMessage(String message) {
 		m_messageBox.setMessage(message);
+		m_messageBox.show(Config.VIEW_CORNER_X, Config.MAIN_WINDOW_HEIGHT);
 		setState(Core.STATE_SHOW_MESSAGE);
 	}
 	

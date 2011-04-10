@@ -12,7 +12,7 @@ import com.redapplecandy.minirpg.util.BattlerComparator;
 
 public class Battle {
 
-	private Bitmap m_background;
+//	private Bitmap m_background;
 	private PriorityQueue<BattleEntity> m_battleQueue;
 	
 	private Party m_playerParty, m_monsterParty;
@@ -29,14 +29,14 @@ public class Battle {
 	 * @param canvas
 	 */
 	public void draw(Canvas canvas) {
-		canvas.drawBitmap(m_background, Config.VIEW_CORNER_X, Config.VIEW_CORNER_Y, null);
+//		canvas.drawBitmap(m_background, Config.VIEW_CORNER_X, Config.VIEW_CORNER_Y, null);
 		
 		int lastMonsterLength = 0;
 		for (int i = 0; i < m_monsterParty.size(); i++) {
 			Monster monster = (Monster) m_monsterParty.getMember(i);
 			monster.draw(canvas, 
 				4 + Config.VIEW_CORNER_X + lastMonsterLength, 
-				Config.VIEW_CORNER_Y + Config.TILE_HEIGHT / 2);
+				Config.VIEW_CORNER_Y + Config.MAIN_WINDOW_HEIGHT / 2);
 			lastMonsterLength = monster.getSprite().getWidth();
 		}
 		

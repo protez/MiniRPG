@@ -12,7 +12,7 @@ public class StatusText {
 		textPaint.setARGB(255, 255, 255, 255);
 		Typeface typeface = Typeface.create("Helvetica", Typeface.NORMAL);
 		textPaint.setTypeface(typeface);
-		canvas.drawText(statusText, 4, Config.STATUS_BAR_POS, textPaint);
+		canvas.drawText(statusText, Config.VIEW_CORNER_X + 4, Config.STATUS_BAR_POS, textPaint);
 		//
 	}
 }

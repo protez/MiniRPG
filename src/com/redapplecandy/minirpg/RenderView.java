@@ -72,7 +72,7 @@ public class RenderView extends SurfaceView implements OnTouchListener, SurfaceH
 				m_core.incAngle();
 			} else if (m_core.currentState() == Core.STATE_MOVING) {
 				m_core.incStep();
-			} else if (m_core.currentState() == Core.STATE_WAIT_MESSAGE) {
+			} else if (m_core.currentState() == Core.STATE_SHOW_MESSAGE) {
 				m_core.advanceMessage();
 			}
 		}
@@ -128,10 +128,10 @@ public class RenderView extends SurfaceView implements OnTouchListener, SurfaceH
 	Vector<InvisibleButton> m_buttons = new Vector<InvisibleButton>();
 	
 	PlayerCharacter testCharacter = PlayerCharacter.createTestCharacter();
-	CharacterWidget characterWidget = new CharacterWidget(testCharacter, 0, 0);
-	CharacterWidget characterWidget2 = new CharacterWidget(testCharacter, 76, 0);
-	CharacterWidget characterWidget3 = new CharacterWidget(testCharacter, 152, 0);
-	CharacterWidget characterWidget4 = new CharacterWidget(testCharacter, 228, 0);
+	CharacterWidget characterWidget = new CharacterWidget(testCharacter, Config.VIEW_CORNER_X + 0, 0);
+	CharacterWidget characterWidget2 = new CharacterWidget(testCharacter, Config.VIEW_CORNER_X + 80, 0);
+	CharacterWidget characterWidget3 = new CharacterWidget(testCharacter, Config.VIEW_CORNER_X + 160, 0);
+	CharacterWidget characterWidget4 = new CharacterWidget(testCharacter, Config.VIEW_CORNER_X + 240, 0);
 	
 	public Raycaster raycaster;
 	
