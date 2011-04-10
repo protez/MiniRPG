@@ -22,9 +22,9 @@ public class MainActivity extends Activity {
 	InvisibleButton m_turnRight;
 	
 	static {
-		System.err.println("*** LOADING LIBRARY!!!");
+		System.err.println("*** LOADING LIBRARY raycaster");
 		System.loadLibrary("raycaster");
-		System.err.println("*** LIBRARY LOADED!!!!!");
+		System.err.println("*** Success");
 	}
 	
     public void onCreate(Bundle savedInstanceState) {

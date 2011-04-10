@@ -2,6 +2,7 @@ package com.redapplecandy.minirpg.ui;
 
 import com.redapplecandy.minirpg.Config;
 import com.redapplecandy.minirpg.Core;
+import com.redapplecandy.minirpg.util.MathUtils;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -81,18 +82,23 @@ public class MessageBox {
 	}
 	
 	public void draw(Canvas canvas) {
+		int cw = canvas.getWidth(), ch = canvas.getHeight();
+		
 		Paint paint = new Paint();
 		paint.setARGB(255, 255, 255, 255);
 		canvas.drawRect(
-			m_x, m_y, 
-			m_x + Config.MAIN_WINDOW_WIDTH, m_y + Config.MESSAGE_BOX_HEIGHT, 
+			MathUtils.scaleX(m_x, cw), MathUtils.scaleY(m_y, ch), 
+			MathUtils.scaleX(m_x + Config.MAIN_WINDOW_WIDTH, cw), 
+			MathUtils.scaleY(m_y + Config.MESSAGE_BOX_HEIGHT, ch), 
 			paint);
 		
 		Paint paint2 = new Paint();
 		paint2.setARGB(255, 0, 0, 0);
 		canvas.drawRect(
-			4 + m_x, m_y + 4, 
-			m_x + Config.MAIN_WINDOW_WIDTH - 4, m_y + Config.MESSAGE_BOX_HEIGHT - 4, 
+			MathUtils.scaleX(4 + m_x, cw), 
+			MathUtils.scaleY(m_y + 4, ch), 
+			MathUtils.scaleX(m_x + Config.MAIN_WINDOW_WIDTH - 4, cw), 
+			MathUtils.scaleY(m_y + Config.MESSAGE_BOX_HEIGHT - 4, ch), 
 			paint2);
 		
 		Paint textPaint = new Paint();
@@ -100,8 +106,9 @@ public class MessageBox {
 		Typeface typeface = Typeface.create("Helvetica", Typeface.NORMAL);
 		textPaint.setTypeface(typeface);
 		for (int i = 0; i < m_buffer.length; i++) {
-			canvas.drawText(m_buffer[i], m_x + 8,
-				m_y + (i+1)*16,
+			canvas.drawText(m_buffer[i], 
+				MathUtils.scaleX(m_x + 8, cw),
+				MathUtils.scaleY(m_y + (i+1)*16, ch),
 				textPaint);
 		}
 	}

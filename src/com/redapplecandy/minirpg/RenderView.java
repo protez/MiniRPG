@@ -220,6 +220,9 @@ public class RenderView extends SurfaceView implements OnTouchListener, SurfaceH
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
+		Config.REAL_WIDTH = this.getWidth();
+		Config.REAL_HEIGHT = this.getHeight();
+		
 		m_gameThread.start();
 	}
 

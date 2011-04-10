@@ -1,6 +1,7 @@
 package com.redapplecandy.minirpg.ui;
 
 import com.redapplecandy.minirpg.Config;
+import com.redapplecandy.minirpg.util.MathUtils;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -55,8 +56,11 @@ public class InvisibleButton {
 	}
 	
 	public boolean isClicked(int x, int y) {
-		if (x >= m_x - m_padding && x <= m_x + width() + m_padding
-			&& y >= m_y - m_padding && y <= m_y + height() + m_padding)
+		int cw = Config.REAL_WIDTH, ch = Config.REAL_HEIGHT;
+		if (x >= MathUtils.scaleX(m_x - m_padding, cw) 
+			&& x <= MathUtils.scaleX(m_x + width() + m_padding, cw)
+			&& y >= MathUtils.scaleY(m_y - m_padding, ch) 
+			&& y <= MathUtils.scaleY(m_y + height() + m_padding, ch))
 		{
 			return true;
 		}

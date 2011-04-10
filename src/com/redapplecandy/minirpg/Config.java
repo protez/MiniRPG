@@ -13,6 +13,9 @@ public class Config {
 	public static final int BASE_WIDTH = 480;
 	public static final int BASE_HEIGHT = 320;
 	
+	public static int REAL_WIDTH = 480;
+	public static int REAL_HEIGHT = 320;
+	
 	public static final int MAIN_WINDOW_WIDTH = 320;
 	public static final int MAIN_WINDOW_HEIGHT = 200;
 	

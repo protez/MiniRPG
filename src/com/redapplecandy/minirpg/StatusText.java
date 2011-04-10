@@ -1,5 +1,7 @@
 package com.redapplecandy.minirpg;
 
+import com.redapplecandy.minirpg.util.MathUtils;
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -12,7 +14,10 @@ public class StatusText {
 		textPaint.setARGB(255, 255, 255, 255);
 		Typeface typeface = Typeface.create("Helvetica", Typeface.NORMAL);
 		textPaint.setTypeface(typeface);
-		canvas.drawText(statusText, Config.VIEW_CORNER_X + 4, Config.STATUS_BAR_POS, textPaint);
+		canvas.drawText(statusText, 
+			MathUtils.scaleX(Config.VIEW_CORNER_X + 4, canvas.getWidth()), 
+			MathUtils.scaleY(Config.STATUS_BAR_POS, canvas.getHeight()), 
+			textPaint);
 		//
 	}
 }

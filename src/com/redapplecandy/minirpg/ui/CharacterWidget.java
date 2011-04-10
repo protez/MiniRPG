@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 
 import com.redapplecandy.minirpg.Config;
 import com.redapplecandy.minirpg.character.PlayerCharacter;
+import com.redapplecandy.minirpg.util.MathUtils;
 
 /**
  * A small rectangular widget displaying the name, hp
@@ -30,30 +31,41 @@ public class CharacterWidget extends InvisibleButton {
 	}
 	
 	public void draw(Canvas canvas) {
+		int cw = canvas.getWidth();
+		int ch = canvas.getHeight();
+		
 		Paint outline = new Paint();
 		outline.setARGB(255, 255, 255, 255);
-		canvas.drawRect(m_x, 
-			m_y, 
-			m_x + m_width, m_y + m_height, outline);
+		canvas.drawRect(MathUtils.scaleX(m_x, cw), 
+			MathUtils.scaleY(m_y, ch), 
+			MathUtils.scaleX(m_x + m_width, cw), 
+			MathUtils.scaleY(m_y + m_height, ch), outline);
 		
 		Paint fill = new Paint();
 		fill.setARGB(255, 0, 0, 0);
-		canvas.drawRect(m_x + 4,
-				m_y + 4,
-				m_x + m_width - 4, m_y + m_height - 4, fill);
+		canvas.drawRect(MathUtils.scaleX(m_x + 4, cw),
+				MathUtils.scaleY(m_y + 4, ch),
+				MathUtils.scaleX(m_x + m_width - 4, cw), 
+				MathUtils.scaleY(m_y + m_height - 4, ch), fill);
 		
 		Paint textPaint = new Paint();
 		Typeface typeface = Typeface.create("Helvetica", Typeface.NORMAL);
 		textPaint.setTypeface(typeface);
 		textPaint.setARGB(255, 255, 255, 255);
 		
-		canvas.drawText(m_chr.name(), m_x + 6, m_y + 16, textPaint);
+		canvas.drawText(m_chr.name(), 
+			MathUtils.scaleX(m_x + 6, cw), 
+			MathUtils.scaleY(m_y + 16, ch), textPaint);
 		
 		Integer curHp = m_chr.currentHp();
 		Integer maxHp = m_chr.maxHp();
 		
-		canvas.drawText("HP " + curHp.toString() + "/" + maxHp.toString(), m_x + 6, m_y + 32, textPaint);
-		canvas.drawText("SP " + curHp.toString() + "/" + maxHp.toString(), m_x + 6, m_y + 48, textPaint);
+		canvas.drawText("HP " + curHp.toString() + "/" + maxHp.toString(), 
+			MathUtils.scaleX(m_x + 6, cw), 
+			MathUtils.scaleY(m_y + 32, ch), textPaint);
+		canvas.drawText("SP " + curHp.toString() + "/" + maxHp.toString(), 
+			MathUtils.scaleX(m_x + 6, cw), 
+			MathUtils.scaleY(m_y + 48, ch), textPaint);
 		
 	}
 	
