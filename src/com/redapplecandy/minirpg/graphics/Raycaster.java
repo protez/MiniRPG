@@ -28,6 +28,8 @@ public class Raycaster {
 	private Bitmap m_wallTexture, m_floorTexture;
 	private Bitmap m_target;
 	
+	private Bitmap[] m_textures;
+	
 	private Matrix m_drawMatrix = new Matrix();
 	
 	public Raycaster(int width, int height) {
@@ -35,14 +37,14 @@ public class Raycaster {
 		m_height = height;
 		
 		int[][] tileMap = {
-			{1, 2, 1, 2, 1, 2, 1, 2},
-			{2, 0, 0, 0, 0, 0, 0, 1},
-			{1, 0, 4, 0, 0, 4, 0, 2},
-			{2, 0, 0, 0, 0, 0, 0, 1},
-			{1, 0, 0, 0, 0, 0, 0, 2},
-			{2, 0, 4, 0, 0, 4, 0, 1},
-			{1, 0, 0, 0, 0, 0, 0, 2},
-			{2, 1, 2, 1, 2, 1, 2, 1},
+			{1, 1, 1, 1, 1, 1, 1, 1},
+			{1, 0, 0, 0, 0, 0, 0, 1},
+			{1, 0, 2, 0, 0, 2, 0, 1},
+			{1, 0, 0, 0, 0, 0, 0, 1},
+			{1, 0, 0, 0, 0, 0, 0, 1},
+			{1, 0, 2, 0, 0, 2, 0, 1},
+			{1, 0, 0, 0, 0, 0, 0, 1},
+			{1, 1, 1, 1, 1, 1, 1, 1},
 		};
 		m_tileMap = tileMap;
 		
@@ -50,12 +52,20 @@ public class Raycaster {
 		
 		m_wallTexture = BitmapLoader.instance().loadById(R.drawable.wall);
 		m_floorTexture = BitmapLoader.instance().loadById(R.drawable.floor64x64);
+		
+		m_textures = new Bitmap[2];
+		m_textures[0] = m_wallTexture;
+		m_textures[1] = m_floorTexture;
+		
+		reserveTextureSpace(2);
+		registerTexture(0, m_wallTexture);
+		registerTexture(1, m_floorTexture);
 	}
 	
 	public void draw(Camera camera, Canvas canvas) {
 		m_target.eraseColor(0);
 		//raycast(camera);
-		raycast(m_target, m_wallTexture, m_floorTexture, 
+		raycast(m_target,
 			ArrayUtils.flattenIntMatrix(m_tileMap), m_tileMap.length, m_tileMap[0].length,
 			camera.pos.x, camera.pos.y, camera.dir.x, camera.dir.y, camera.plane.x, camera.plane.y);
 		
@@ -69,8 +79,12 @@ public class Raycaster {
 	}
 	
 	private static native void raycast(
-		Bitmap bitmap, Bitmap wallTexture, Bitmap floorTexture, int[] _tileMap,
+		Bitmap bitmap, int[] _tileMap,
 		int width, int height, float camX, float camY, float camDirX,
 		float camDirY, float camPlaneX, float camPlaneY);
+	
+	private static native void reserveTextureSpace(int numberOfTextures);
+	
+	private static native void registerTexture(int textureNumber, Bitmap texture);
 	
 }

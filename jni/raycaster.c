@@ -3,13 +3,23 @@
 #include <android/log.h>
 
 #include <math.h>
+#include <stdlib.h>
 
-#define  LOG_TAG    "libplasma"
+#define  LOG_TAG    "libraycast"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
 
 // width * y + x
+
+JNIEnv* currentEnv = NULL;
+
+typedef struct _Texture {
+	AndroidBitmapInfo info;
+	jobject bitmap;
+} Texture;
+
+static Texture* textureTable;
 
 static const int TEXTURE_SIZE = 64;
 
@@ -35,12 +45,16 @@ RayInfo castRay(Camera, int, jint*, int, int);
 
 void raycast(Camera camera, 
 	AndroidBitmapInfo* bmpInfo, void* bmpPixels,
-	AndroidBitmapInfo* wallInfo, void* wallPixels,
-	AndroidBitmapInfo* floorInfo, void* floorPixels,
 	jint* tileMap) 
 {
 	int x, y;
 	
+	Texture* wallTexture;
+	Texture* floorTexture;
+
+	void* wallPixels;
+	void* floorPixels;
+
 	for (x = 0; x < bmpInfo->width; x++) {
 		// Point to start of bmpPixels
 		void* currentPixels = bmpPixels;
@@ -50,7 +64,15 @@ void raycast(Camera camera,
 		int wallStart, wallEnd;
 		
 		RayInfo info = castRay(camera, x, tileMap, bmpInfo->width, bmpInfo->height);
-		
+		int textureId = info.tileId - 1;	// 0 is "emtpy"
+
+		// TODO: Shall depend on textur ID in tilemap.
+		wallTexture = &textureTable[textureId];
+		floorTexture = &textureTable[1];
+
+		AndroidBitmap_lockPixels(currentEnv, wallTexture->bitmap, &wallPixels);
+		AndroidBitmap_lockPixels(currentEnv, floorTexture->bitmap, &floorPixels);
+
 		// m_zbuffer[x] = info.wallDist;
 		
 		lineHeight = (int)fabs((float)bmpInfo->height / info.wallDist);
@@ -70,7 +92,7 @@ void raycast(Camera camera,
 			textureY = ((d * TEXTURE_SIZE) / lineHeight) / 256;
 
 			void* texturePointer = wallPixels;
-			texturePointer = (char*)texturePointer + wallInfo->stride * textureY;
+			texturePointer = (char*)texturePointer + wallTexture->info.stride * textureY;
 			uint16_t* textureLine = (uint16_t*) texturePointer;
 			
 			uint16_t color = textureLine[info.textureX];
@@ -107,7 +129,7 @@ void raycast(Camera camera,
 			floorTextureY = (int)(currentFloorY * TEXTURE_SIZE) % TEXTURE_SIZE;
 			
 			void* texturePointer = floorPixels;
-			texturePointer = (char*)texturePointer + floorInfo->stride * floorTextureY;
+			texturePointer = (char*)texturePointer + floorTexture->info.stride * floorTextureY;
 			uint16_t* textureLine = (uint16_t*) texturePointer;
 			
 			uint16_t color = textureLine[floorTextureX];
@@ -122,7 +144,10 @@ void raycast(Camera camera,
 	
 			currentPixels = (char*)currentPixels + bmpInfo->stride;
 		}
-		
+	
+		AndroidBitmap_unlockPixels(currentEnv, wallTexture->bitmap);
+		AndroidBitmap_unlockPixels(currentEnv, floorTexture->bitmap);
+
 	}
 	
 }
@@ -234,23 +259,31 @@ RayInfo castRay(Camera camera, int x, jint* tileMap, int width, int height) {
  * JNI Export Function
  */
 JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
-	(JNIEnv* env, jobject obj, jobject bitmap, jobject wallTexture, jobject floorTexture,
+	(JNIEnv* env, jobject obj, jobject bitmap,
 	 jintArray _tileMap, jint width, jint height,
 	 jfloat camX, jfloat camY, jfloat camDirX, jfloat camDirY, jfloat camPlaneX, jfloat camPlaneY)
 {
+	currentEnv = env;
+
 //	LOGE("*** RAYCAST ***");
 	AndroidBitmapInfo bitmapInfo;
+	/*
 	AndroidBitmapInfo floorTextureInfo;
 	AndroidBitmapInfo wallTextureInfo;
+	*/
 	void* pixels;
+	/*
 	void* wallPixels;
 	void* floorPixels;
+	*/
 
 //	LOGE("*** GETTING BITMAP INFO ***");	
 	AndroidBitmap_getInfo(env, bitmap, &bitmapInfo);
+	/*
 	AndroidBitmap_getInfo(env, wallTexture, &wallTextureInfo);
 	AndroidBitmap_getInfo(env, floorTexture, &floorTextureInfo);
-	
+	*/
+
 	if (bitmapInfo.format != ANDROID_BITMAP_FORMAT_RGB_565) {
 		int fmt = bitmapInfo.format;
 		LOGE("*** BITMAP WRONG FORMAT ***: %s", 
@@ -267,6 +300,7 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 			"ERROR" );
 		return;
 	}
+	/*
 	if (floorTextureInfo.format != ANDROID_BITMAP_FORMAT_RGB_565) {
 		int fmt = bitmapInfo.format;
 		LOGE("*** BITMAP WRONG FORMAT ***: %s", 
@@ -299,11 +333,14 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 			"ERROR" );
 		return;
 	}
+	*/
 	
 //	LOGE("*** LOCKING PIXELS .... ***");	
 	AndroidBitmap_lockPixels(env, bitmap, &pixels);
+	/*
 	AndroidBitmap_lockPixels(env, wallTexture, &wallPixels);
 	AndroidBitmap_lockPixels(env, floorTexture, &floorPixels);
+	*/
 //	LOGE("*** ... PIXELS LOCKED ***");	
 	
 	Camera camera = { 
@@ -321,18 +358,59 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 //	LOGE("***  CALLING RAYCAST ***");	
 	raycast(camera, 
 		&bitmapInfo, pixels, 
-		&wallTextureInfo, wallPixels, 
-		&floorTextureInfo, floorPixels,
 		tileMap);
 
 //	LOGE("***  UNLOCKING PIXELS ***");
 	
+	/*
 	AndroidBitmap_unlockPixels(env, floorTexture);
 	AndroidBitmap_unlockPixels(env, wallTexture);	
+	*/
 	AndroidBitmap_unlockPixels(env, bitmap);
 	
 //	LOGE("*** RELEASING ARRAY ***");
 	(*env)->ReleaseIntArrayElements(env, _tileMap, tileMap, 0);
 	
 //	LOGE("*** ALL DONE ***");
+}
+
+JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_reserveTextureSpace
+	(JNIEnv* env, jobject obj, jint numberOfTextures)
+{
+	LOGI("Reserving texture space for %d textures", (int)numberOfTextures);
+
+	textureTable = calloc((int)numberOfTextures, sizeof(Texture));
+}
+
+JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_registerTexture
+	(JNIEnv* env, jobject obj, jint textureNumber, jobject texture)
+{
+	AndroidBitmapInfo textureInfo;
+
+	AndroidBitmap_getInfo(env, texture, &textureInfo);
+
+	if (textureInfo.format != ANDROID_BITMAP_FORMAT_RGB_565) {
+		int fmt = textureInfo.format;
+		LOGE("*** BITMAP WRONG FORMAT ***: %s", 
+			fmt == 0 ? 
+				"NONE" : 
+			fmt == 1 ? 
+				"RGBA_8888" : 
+			fmt == 4 ? 
+				"RGB_565" : 
+			fmt == 7 ? 
+				"RGBA_4444" : 
+			fmt == 8 ? 
+				"A_8" : 
+			"ERROR" );
+		return;
+	}
+
+	LOGI("Storing texture at position %d in texture table.", textureNumber);
+
+	Texture _texture;
+	_texture.info = textureInfo;
+	_texture.bitmap = (*env)->NewGlobalRef(env, texture);	// TODO: Must be freed later with DeletGlobalRef!
+
+	textureTable[textureNumber] = _texture;
 }
