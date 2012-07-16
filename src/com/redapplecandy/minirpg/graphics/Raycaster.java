@@ -25,6 +25,8 @@ public class Raycaster {
 	
 	private int m_width, m_height;
 	private int[][] m_tileMap;
+	private int[][] m_floorMap;
+	private int[][] m_ceilMap;
 	private Bitmap m_wallTexture, m_floorTexture;
 	private Bitmap m_target;
 	
@@ -46,7 +48,30 @@ public class Raycaster {
 			{1, 0, 0, 0, 0, 0, 0, 1},
 			{1, 1, 1, 1, 1, 1, 1, 1},
 		};
+		int[][] floorMap = {
+				{1, 2, 1, 2, 1, 2, 1, 2},
+				{2, 1, 2, 1, 2, 1, 2, 1},
+				{1, 2, 1, 2, 1, 2, 1, 2},
+				{2, 1, 2, 1, 2, 1, 2, 1},
+				{1, 2, 1, 2, 1, 2, 1, 2},
+				{2, 1, 2, 1, 2, 1, 2, 1},
+				{1, 2, 1, 2, 1, 2, 1, 2},
+				{2, 1, 2, 1, 2, 1, 2, 1},
+		};
+		int[][] ceilMap = {
+				{2, 2, 2, 2, 2, 2, 2, 2},
+				{2, 2, 2, 2, 2, 2, 2, 2},
+				{2, 2, 2, 2, 2, 2, 2, 2},
+				{2, 2, 2, 1, 1, 2, 2, 2},
+				{2, 2, 2, 1, 1, 2, 2, 2},
+				{2, 2, 2, 2, 2, 2, 2, 2},
+				{2, 2, 2, 2, 2, 2, 2, 2},
+				{2, 2, 2, 2, 2, 2, 2, 2},
+		};
+		
 		m_tileMap = tileMap;
+		m_floorMap = floorMap;
+		m_ceilMap = ceilMap;
 		
 		m_target = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
 		
@@ -66,7 +91,10 @@ public class Raycaster {
 		m_target.eraseColor(0);
 		//raycast(camera);
 		raycast(m_target,
-			ArrayUtils.flattenIntMatrix(m_tileMap), m_tileMap.length, m_tileMap[0].length,
+			ArrayUtils.flattenIntMatrix(m_tileMap),
+			ArrayUtils.flattenIntMatrix(m_floorMap),
+			ArrayUtils.flattenIntMatrix(m_ceilMap),
+			m_tileMap.length, m_tileMap[0].length,
 			camera.pos.x, camera.pos.y, camera.dir.x, camera.dir.y, camera.plane.x, camera.plane.y);
 		
 		Pair<Float, Float> scale = MathUtils.scaleFactor(canvas.getWidth(), canvas.getHeight());
@@ -79,7 +107,7 @@ public class Raycaster {
 	}
 	
 	private static native void raycast(
-		Bitmap bitmap, int[] _tileMap,
+		Bitmap bitmap, int[] _tileMap, int[] _floorMap, int[] _ceilMap,
 		int width, int height, float camX, float camY, float camDirX,
 		float camDirY, float camPlaneX, float camPlaneY);
 	

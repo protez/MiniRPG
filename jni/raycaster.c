@@ -45,15 +45,17 @@ RayInfo castRay(Camera, int, jint*, int, int);
 
 void raycast(Camera camera, 
 	AndroidBitmapInfo* bmpInfo, void* bmpPixels,
-	jint* tileMap) 
+	jint* tileMap, jint* floorMap, jint* ceilMap) 
 {
 	int x, y;
 	
 	Texture* wallTexture;
 	Texture* floorTexture;
+	Texture* ceilTexture;
 
 	void* wallPixels;
 	void* floorPixels;
+	void* ceilPixels;
 
 	for (x = 0; x < bmpInfo->width; x++) {
 		// Point to start of bmpPixels
@@ -68,10 +70,8 @@ void raycast(Camera camera,
 
 		// TODO: Shall depend on textur ID in tilemap.
 		wallTexture = &textureTable[textureId];
-		floorTexture = &textureTable[1];
 
 		AndroidBitmap_lockPixels(currentEnv, wallTexture->bitmap, &wallPixels);
-		AndroidBitmap_lockPixels(currentEnv, floorTexture->bitmap, &floorPixels);
 
 		// m_zbuffer[x] = info.wallDist;
 		
@@ -119,7 +119,8 @@ void raycast(Camera camera,
 			int floorTextureX, floorTextureY;
 			float weight;
 			float currentFloorX, currentFloorY;
-			
+			int textureIndex;
+
 			currentDist = (float)bmpInfo->height / (2.0f * y - bmpInfo->height);
 			
 			weight = (currentDist - cameraDist) / (info.wallDist - cameraDist);
@@ -128,25 +129,41 @@ void raycast(Camera camera,
 			floorTextureX = (int)(currentFloorX * TEXTURE_SIZE) % TEXTURE_SIZE;
 			floorTextureY = (int)(currentFloorY * TEXTURE_SIZE) % TEXTURE_SIZE;
 			
+			textureIndex = (int)currentFloorY * mapWidth + (int)currentFloorX;
+
+			floorTexture = &textureTable[floorMap[textureIndex] - 1];
+			ceilTexture = &textureTable[ceilMap[textureIndex] - 1];
+			AndroidBitmap_lockPixels(currentEnv, floorTexture->bitmap, &floorPixels);
+			AndroidBitmap_lockPixels(currentEnv, ceilTexture->bitmap, &ceilPixels);
+
+			// Floor
 			void* texturePointer = floorPixels;
 			texturePointer = (char*)texturePointer + floorTexture->info.stride * floorTextureY;
 			uint16_t* textureLine = (uint16_t*) texturePointer;
 			
 			uint16_t color = textureLine[floorTextureX];
-			// Floor
+
 			line[x] = color;
 
-			// Ceiling			
+			// Ceiling
+			texturePointer = ceilPixels;
+			texturePointer = (char*)texturePointer + ceilTexture->info.stride * floorTextureY;
+			textureLine = (uint16_t*)texturePointer;
+
+			color = textureLine[floorTextureX];
+
 			void* ceilLoc = bmpPixels;
 			ceilLoc = (char*)ceilLoc + bmpInfo->stride * (bmpInfo->height - y);
 			line = (uint16_t *) ceilLoc;
 			line[x] = color;
 	
 			currentPixels = (char*)currentPixels + bmpInfo->stride;
+
+			AndroidBitmap_unlockPixels(currentEnv, floorTexture->bitmap);
+			AndroidBitmap_unlockPixels(currentEnv, ceilTexture->bitmap);
 		}
 	
 		AndroidBitmap_unlockPixels(currentEnv, wallTexture->bitmap);
-		AndroidBitmap_unlockPixels(currentEnv, floorTexture->bitmap);
 
 	}
 	
@@ -260,29 +277,19 @@ RayInfo castRay(Camera camera, int x, jint* tileMap, int width, int height) {
  */
 JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 	(JNIEnv* env, jobject obj, jobject bitmap,
-	 jintArray _tileMap, jint width, jint height,
+	 jintArray _tileMap, jintArray _floorMap, jintArray _ceilMap, jint width, jint height,
 	 jfloat camX, jfloat camY, jfloat camDirX, jfloat camDirY, jfloat camPlaneX, jfloat camPlaneY)
 {
 	currentEnv = env;
 
 //	LOGE("*** RAYCAST ***");
 	AndroidBitmapInfo bitmapInfo;
-	/*
-	AndroidBitmapInfo floorTextureInfo;
-	AndroidBitmapInfo wallTextureInfo;
-	*/
+
 	void* pixels;
-	/*
-	void* wallPixels;
-	void* floorPixels;
-	*/
+
 
 //	LOGE("*** GETTING BITMAP INFO ***");	
 	AndroidBitmap_getInfo(env, bitmap, &bitmapInfo);
-	/*
-	AndroidBitmap_getInfo(env, wallTexture, &wallTextureInfo);
-	AndroidBitmap_getInfo(env, floorTexture, &floorTextureInfo);
-	*/
 
 	if (bitmapInfo.format != ANDROID_BITMAP_FORMAT_RGB_565) {
 		int fmt = bitmapInfo.format;
@@ -300,47 +307,10 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 			"ERROR" );
 		return;
 	}
-	/*
-	if (floorTextureInfo.format != ANDROID_BITMAP_FORMAT_RGB_565) {
-		int fmt = bitmapInfo.format;
-		LOGE("*** BITMAP WRONG FORMAT ***: %s", 
-			fmt == 0 ? 
-				"NONE" : 
-			fmt == 1 ? 
-				"RGBA_8888" : 
-			fmt == 4 ? 
-				"RGB_565" : 
-			fmt == 7 ? 
-				"RGBA_4444" : 
-			fmt == 8 ? 
-				"A_8" : 
-			"ERROR" );
-		return;
-	}
-	if (wallTextureInfo.format != ANDROID_BITMAP_FORMAT_RGB_565) {
-		int fmt = bitmapInfo.format;
-		LOGE("*** BITMAP WRONG FORMAT ***: %s", 
-			fmt == 0 ? 
-				"NONE" : 
-			fmt == 1 ? 
-				"RGBA_8888" : 
-			fmt == 4 ? 
-				"RGB_565" : 
-			fmt == 7 ? 
-				"RGBA_4444" : 
-			fmt == 8 ? 
-				"A_8" : 
-			"ERROR" );
-		return;
-	}
-	*/
 	
 //	LOGE("*** LOCKING PIXELS .... ***");	
 	AndroidBitmap_lockPixels(env, bitmap, &pixels);
-	/*
-	AndroidBitmap_lockPixels(env, wallTexture, &wallPixels);
-	AndroidBitmap_lockPixels(env, floorTexture, &floorPixels);
-	*/
+
 //	LOGE("*** ... PIXELS LOCKED ***");	
 	
 	Camera camera = { 
@@ -354,22 +324,22 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 	
 //	LOGE("***  GETTING INT ARRAY ELEMENTS ***");
 	jint* tileMap = (*env)->GetIntArrayElements(env, _tileMap, NULL);
+	jint* floorMap = (*env)->GetIntArrayElements(env, _floorMap, NULL);
+	jint* ceilMap = (*env)->GetIntArrayElements(env, _ceilMap, NULL);
 
 //	LOGE("***  CALLING RAYCAST ***");	
 	raycast(camera, 
 		&bitmapInfo, pixels, 
-		tileMap);
+		tileMap, floorMap, ceilMap);
 
 //	LOGE("***  UNLOCKING PIXELS ***");
-	
-	/*
-	AndroidBitmap_unlockPixels(env, floorTexture);
-	AndroidBitmap_unlockPixels(env, wallTexture);	
-	*/
+
 	AndroidBitmap_unlockPixels(env, bitmap);
 	
 //	LOGE("*** RELEASING ARRAY ***");
 	(*env)->ReleaseIntArrayElements(env, _tileMap, tileMap, 0);
+	(*env)->ReleaseIntArrayElements(env, _floorMap, floorMap, 0);
+	(*env)->ReleaseIntArrayElements(env, _ceilMap, ceilMap, 0);
 	
 //	LOGE("*** ALL DONE ***");
 }
