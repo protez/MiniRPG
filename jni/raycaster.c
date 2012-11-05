@@ -41,6 +41,44 @@ typedef struct _RayInfo {
 	int tileId;
 } RayInfo;
 
+void extractRgb565(uint16_t color, uint8_t* r, uint8_t* g, uint8_t* b)
+{
+    static uint16_t red_mask = 0xF800;
+    static uint16_t green_mask = 0x7E0;
+    static uint16_t blue_mask = 0x1F;
+
+    *r = (color & red_mask) >> 11;
+    *g = (color & green_mask) >> 5;
+    *b = (color & blue_mask);
+}
+
+uint16_t composeRgb565(uint16_t r, uint16_t g, uint16_t b)
+{
+    return (r << 11) | (g << 5) | b;
+}
+
+uint16_t computeIntensity(uint16_t pixel, float objectIntensity, float multiplier, float distance) 
+{
+    float intensity = objectIntensity / distance * multiplier;
+
+    uint8_t r, g, b;
+    extractRgb565(pixel, &r, &g, &b);
+
+    float fr = (float) r;
+    float fg = (float) g;
+    float fb = (float) b;
+
+    fr *= intensity;
+    fg *= intensity;
+    fb *= intensity;
+
+    r = (uint8_t) fr;
+    g = (uint8_t) fg;
+    b = (uint8_t) fb;
+
+    return composeRgb565(r, g, b);
+}
+
 RayInfo castRay(Camera, int, jint*, int, int);
 
 void raycast(Camera camera, 
@@ -97,7 +135,7 @@ void raycast(Camera camera,
 			
 			uint16_t color = textureLine[info.textureX];
 			
-			line[x] = color;
+			line[x] = computeIntensity(color, 0.5, 1.0, info.wallDist);
 			
 			// Advance pointer.
 			currentPixels = (char*)currentPixels + bmpInfo->stride;
@@ -143,7 +181,7 @@ void raycast(Camera camera,
 			
 			uint16_t color = textureLine[floorTextureX];
 
-			line[x] = color;
+			line[x] = computeIntensity(color, 0.5, 1.0, currentDist);
 
 			// Ceiling
 			texturePointer = ceilPixels;
@@ -155,7 +193,7 @@ void raycast(Camera camera,
 			void* ceilLoc = bmpPixels;
 			ceilLoc = (char*)ceilLoc + bmpInfo->stride * (bmpInfo->height - y);
 			line = (uint16_t *) ceilLoc;
-			line[x] = color;
+			line[x] = computeIntensity(color, 0.5, 1.0, currentDist);
 	
 			currentPixels = (char*)currentPixels + bmpInfo->stride;
 
