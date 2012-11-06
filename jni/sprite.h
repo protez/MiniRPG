@@ -22,11 +22,13 @@ public:
 
   inline void setDistance(float distance) { m_distance = distance; }
   inline float distance() const { return m_distance; }
-  
+
   inline unsigned int id() const { return m_id; }
 
   inline void setPosition(Vec2 pos) { m_position = pos; }
-  inline Vec2 getPosition() const { return m_position; }
+  inline Vec2 position() const { return m_position; }
+
+  inline unsigned int textureRef() const { return m_textureRef; }
 private:
   unsigned int m_id;
   unsigned int m_textureRef;  // Key to textureTable.
@@ -67,7 +69,13 @@ public:
 
   void updateSpritePosition(unsigned int spriteId, Vec2 position);
 
+  void updateSpriteDistances(float origX, float origY);
+
   void sort();
+
+  inline SpriteInfo* getSpriteAtIndex(size_t index) const { return m_sprites[index]; }
+
+  inline size_t size() const { return m_sprites.size(); }
 private:
   typedef std::vector<SpriteInfo*> Sprites;
   Sprites m_sprites;

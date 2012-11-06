@@ -95,7 +95,7 @@ C:/Users/tomas/MiniRPG//obj/local/armeabi/objs/raycaster/raycaster.o: \
  C:/Users/tomas/android-ndk-r8/sources/cxx-stl/stlport/stlport/stl/_tempbuf.h \
  C:/Users/tomas/android-ndk-r8/sources/cxx-stl/stlport/stlport/stl/_tempbuf.c \
  C:/Users/tomas/MiniRPG//jni/log_macros.h \
- C:/Users/tomas/MiniRPG//jni/vec2.h
+ C:/Users/tomas/MiniRPG//jni/vec2.h C:/Users/tomas/MiniRPG//jni/sprite.h
 
 C:/Users/tomas/android-ndk-r8/platforms/android-8/arch-arm/usr/include/jni.h:
 
@@ -288,3 +288,5 @@ C:/Users/tomas/android-ndk-r8/sources/cxx-stl/stlport/stlport/stl/_tempbuf.c:
 C:/Users/tomas/MiniRPG//jni/log_macros.h:
 
 C:/Users/tomas/MiniRPG//jni/vec2.h:
+
+C:/Users/tomas/MiniRPG//jni/sprite.h:

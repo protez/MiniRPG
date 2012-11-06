@@ -28,3 +28,18 @@ void SpriteBatch::sort()
 {
   std::sort(m_sprites.begin(), m_sprites.end(), SpriteCompare());
 }
+
+void SpriteBatch::updateSpriteDistances(float origX, float origY)
+{
+  for (Sprites::iterator sprIter = m_sprites.begin();
+       sprIter != m_sprites.end();
+       ++sprIter)
+  {
+    SpriteInfo* info = *sprIter;
+    Vec2 pos = info->position();
+
+    float distance = (origX - pos.x) * (origX - pos.x) + (origY - pos.y) * (origY - pos.y);
+
+    info->setDistance(distance);
+  }
+}

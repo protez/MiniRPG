@@ -10,6 +10,7 @@
 
 #include "log_macros.h"
 #include "vec2.h"
+#include "sprite.h"
 
 // width * y + x
 
@@ -84,6 +85,8 @@ public:
     jint* tileMap, jint* floorMap, jint* ceilMap);
 
   void raycast();
+
+  SpriteBatch& spriteBatch() { return m_spriteBatch; }
 private:
   struct RayInfo {
     float wallDist;
@@ -103,6 +106,8 @@ private:
   jint* m_tileMap;
   jint* m_floorMap;
   jint* m_ceilMap;
+
+  SpriteBatch m_spriteBatch;
 };
 
 void Raycaster::setData(Camera camera, 
@@ -138,9 +143,8 @@ void Raycaster::raycast()
 		int wallStart, wallEnd;
 		
 		RayInfo info = castRay(x, m_bmpInfo->width, m_bmpInfo->height);
-		int textureId = info.tileId - 1;	// 0 is "emtpy"
 
-		// TODO: Shall depend on textur ID in tilemap.
+		int textureId = info.tileId - 1;	// 0 is "emtpy"
 		wallTexture = &textureTable[textureId];
 
 		AndroidBitmap_lockPixels(currentEnv, wallTexture->bitmap, &wallPixels);
@@ -239,6 +243,91 @@ void Raycaster::raycast()
 
 	}
 	
+  // Draw sprites
+  Texture* spriteTexture;
+  void* spritePixels;
+
+  m_spriteBatch.updateSpriteDistances(m_camera.pos.x, m_camera.pos.y);
+  m_spriteBatch.sort();
+
+  for (size_t i = 0; i < m_spriteBatch.size(); i++)
+  {
+    void* currentPixels = m_bmpPixels;
+
+    SpriteInfo* sprite = m_spriteBatch.getSpriteAtIndex(i);
+
+    spriteTexture = &textureTable[sprite->textureRef()];
+
+    AndroidBitmap_lockPixels(currentEnv, spriteTexture->bitmap, &spritePixels);
+
+    float spriteX = sprite->position().x;
+    float spriteY = sprite->position().y;
+
+    float invDet = 1.0f / (m_camera.plane.x * m_camera.dir.y - m_camera.dir.x * m_camera.plane.y);
+
+    float transformX = invDet * (m_camera.dir.y * spriteX - m_camera.dir.x * spriteY);
+    float transformY = invDet * (-m_camera.plane.y * spriteX + m_camera.plane.x * spriteY);
+
+    int spriteScreenX = static_cast<int>(
+        (m_bmpInfo->width / 2) * (1 + transformX / transformY)
+      );
+
+    // Height of sprite
+    int spriteHeight = abs( static_cast<int> (m_bmpInfo->height / transformY) );
+
+    int drawStartY = -spriteHeight / 2 + m_bmpInfo->height / 2;
+    if (drawStartY < 0) drawStartY = 0;
+
+    int drawEndY = spriteHeight / 2 + m_bmpInfo->height / 2;
+    if (drawEndY >= m_bmpInfo->height) drawEndY = m_bmpInfo->height - 1;
+
+    // Width of sprite
+    int spriteWidth = abs( static_cast<int> (m_bmpInfo->height / transformY) );
+
+    int drawStartX = -spriteWidth / 2 + spriteScreenX;
+    if (drawStartX < 0) drawStartX = 0;
+
+    int drawEndX = spriteWidth / 2 + spriteScreenX;
+    if (drawEndX >= m_bmpInfo->width) drawEndX = m_bmpInfo->width - 1;
+
+    for (x = drawStartX; x < drawEndX; x++)  // <= ?
+    {
+      currentPixels = (char*)currentPixels + m_bmpInfo->stride * drawStartY + x;
+
+      int texX = static_cast<int>(
+        256 * (x - (-spriteWidth / 2 + spriteScreenX)) * TEXTURE_SIZE / spriteWidth
+      ) / 256;
+
+      if (transformY > 0 && x > 0 && x < m_bmpInfo->width && transformY < zbuffer[x])
+      {
+        for (y = drawStartY; y < drawEndY; y++) // <= ?
+        {
+          uint16_t* line = (uint16_t *) currentPixels;
+
+          int d = y * 256 - m_bmpInfo->height * 128 + spriteHeight * 128;
+          int texY = ((d * TEXTURE_SIZE) / spriteHeight) / 256;
+
+          void* texturePointer = spritePixels;
+          texturePointer = (char*)texturePointer + spriteTexture->info.stride * texY;
+
+          uint16_t* textureLine = (uint16_t*) texturePointer;      
+          uint16_t color = textureLine[texX];
+
+          if (color)
+          {
+            line[x] = color;
+          }
+
+          currentPixels = (char*)currentPixels + m_bmpInfo->stride;
+        }
+      }
+
+      currentPixels = m_bmpPixels;
+    }
+
+    AndroidBitmap_unlockPixels(currentEnv, spriteTexture->bitmap);
+  }
+
 }
 
 Raycaster::RayInfo Raycaster::castRay(int x, int width, int height) 
@@ -462,6 +551,18 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_registe
 	_texture.bitmap = env->NewGlobalRef(texture);	// TODO: Must be freed later with DeletGlobalRef!
 
 	textureTable[textureNumber] = _texture;
+}
+
+JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_addSprite
+  (JNIEnv* env, jobject obj, jfloat worldX, jfloat worldY, jint textureRef, jint id)
+{
+  LOGI("Adding a new sprite at (%f, %f) with textureRef=%d and id=%d", worldX, worldY, textureRef, id);
+
+  SpriteInfo* sprite = new SpriteInfo
+    (static_cast<unsigned int>(id), static_cast<unsigned int>(textureRef),
+     Vec2(static_cast<float>(worldX), static_cast<float>(worldY)));
+
+  raycaster.spriteBatch().addSprite(sprite);
 }
 
 #ifdef __cplusplus

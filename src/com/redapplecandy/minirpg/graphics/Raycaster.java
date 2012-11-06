@@ -27,7 +27,7 @@ public class Raycaster {
 	private int[][] m_tileMap;
 	private int[][] m_floorMap;
 	private int[][] m_ceilMap;
-	private Bitmap m_wallTexture, m_floorTexture;
+	private Bitmap m_wallTexture, m_floorTexture, m_devilTexture;
 	private Bitmap m_target;
 	
 	private Bitmap[] m_textures;
@@ -77,14 +77,19 @@ public class Raycaster {
 		
 		m_wallTexture = BitmapLoader.instance().loadById(R.drawable.wall);
 		m_floorTexture = BitmapLoader.instance().loadById(R.drawable.floor64x64);
+		m_devilTexture = BitmapLoader.instance().loadById(R.drawable.devil);
 		
-		m_textures = new Bitmap[2];
+		m_textures = new Bitmap[3];
 		m_textures[0] = m_wallTexture;
 		m_textures[1] = m_floorTexture;
+		m_textures[2] = m_devilTexture;
 		
-		reserveTextureSpace(2);
+		reserveTextureSpace(3);
 		registerTexture(0, m_wallTexture);
 		registerTexture(1, m_floorTexture);
+		registerTexture(2, m_devilTexture);
+		
+		addSprite(3.5f, 3.5f, 2, 0);
 	}
 	
 	public void draw(Camera camera, Canvas canvas) {
@@ -115,4 +120,5 @@ public class Raycaster {
 	
 	private static native void registerTexture(int textureNumber, Bitmap texture);
 	
+	private static native void addSprite(float worldX, float worldY, int textureRef, int id);
 }
