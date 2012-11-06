@@ -20,7 +20,9 @@ public:
     LOGI("Destroying sprite with id=%d", m_id);
   }
 
+  inline void setDistance(float distance) { m_distance = distance; }
   inline float distance() const { return m_distance; }
+  
   inline unsigned int id() const { return m_id; }
 
   inline void setPosition(Vec2 pos) { m_position = pos; }
