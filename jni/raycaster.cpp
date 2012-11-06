@@ -5,16 +5,18 @@
 #include <cmath>
 #include <cstdlib>
 
-#define  LOG_TAG    "libraycast"
-#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
-#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+#include <vector>
+#include <algorithm>
 
+#include "log_macros.h"
+#include "vec2.h"
 
 // width * y + x
 
 JNIEnv* currentEnv = NULL;
 
-struct Texture {
+struct Texture 
+{
 	AndroidBitmapInfo info;
 	jobject bitmap;
 };
@@ -25,11 +27,10 @@ static const int TEXTURE_SIZE = 64;
 
 int mapWidth, mapHeight;
 
-struct Vec2 {
-	float x, y;
-};
+float zbuffer[320];
 
-struct Camera {
+struct Camera 
+{
 	Vec2 pos, dir, plane;
 };
 
@@ -74,17 +75,13 @@ uint16_t computeIntensity(uint16_t pixel, float objectIntensity, float multiplie
 class Raycaster
 {
 public:
-  Raycaster(Camera camera, 
-    AndroidBitmapInfo* bmpInfo, void* bmpPixels,
-    jint* tileMap, jint* floorMap, jint* ceilMap)
-   : m_camera(camera),
-     m_bmpInfo(bmpInfo),
-     m_bmpPixels(bmpPixels),
-     m_tileMap(tileMap),
-     m_floorMap(floorMap),
-     m_ceilMap(ceilMap)
+  Raycaster()
   {
   }
+
+  void setData(Camera camera, 
+    AndroidBitmapInfo* bmpInfo, void* bmpPixels,
+    jint* tileMap, jint* floorMap, jint* ceilMap);
 
   void raycast();
 private:
@@ -107,6 +104,18 @@ private:
   jint* m_floorMap;
   jint* m_ceilMap;
 };
+
+void Raycaster::setData(Camera camera, 
+    AndroidBitmapInfo* bmpInfo, void* bmpPixels,
+    jint* tileMap, jint* floorMap, jint* ceilMap)
+{
+  m_camera = camera;
+  m_bmpInfo = bmpInfo;
+  m_bmpPixels = bmpPixels;
+  m_tileMap = tileMap;
+  m_floorMap = floorMap;
+  m_ceilMap = ceilMap;
+}
 
 void Raycaster::raycast() 
 {
@@ -136,7 +145,7 @@ void Raycaster::raycast()
 
 		AndroidBitmap_lockPixels(currentEnv, wallTexture->bitmap, &wallPixels);
 
-		// m_zbuffer[x] = info.wallDist;
+		zbuffer[x] = info.wallDist;
 		
 		lineHeight = (int)fabs((float)m_bmpInfo->height / info.wallDist);
 		wallStart = -lineHeight / 2 + m_bmpInfo->height / 2;
@@ -246,8 +255,8 @@ Raycaster::RayInfo Raycaster::castRay(int x, int width, int height)
 	
 	float camX = 2.0f * (float)x / (float)width - 1.0f;
 	Vec2 ray = m_camera.pos;
-	Vec2 rayDir = { m_camera.dir.x + m_camera.plane.x * camX,
-					m_camera.dir.y + m_camera.plane.y * camX };
+	Vec2 rayDir(m_camera.dir.x + m_camera.plane.x * camX,
+					    m_camera.dir.y + m_camera.plane.y * camX);
 	
 	mapX = (int) ray.x;
 	mapY = (int) ray.y;
@@ -334,6 +343,8 @@ Raycaster::RayInfo Raycaster::castRay(int x, int width, int height)
 	return info;
 }
 
+Raycaster raycaster;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -380,9 +391,9 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 //	LOGE("*** ... PIXELS LOCKED ***");	
 	
 	Camera camera = { 
-		{camX, camY}, 
-		{camDirX, camDirY}, 
-		{camPlaneX, camPlaneY} 
+		Vec2(camX, camY),
+		Vec2(camDirX, camDirY),
+		Vec2(camPlaneX, camPlaneY)
 	};
 	
 	mapWidth = width;
@@ -394,10 +405,10 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 	jint* ceilMap = env->GetIntArrayElements(_ceilMap, NULL);
 
 //	LOGE("***  CALLING RAYCAST ***");	
-
-  Raycaster raycaster(camera, 
+  raycaster.setData(camera, 
     &bitmapInfo, pixels, 
     tileMap, floorMap, ceilMap);
+
   raycaster.raycast();
 
 //	LOGE("***  UNLOCKING PIXELS ***");
