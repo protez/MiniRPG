@@ -14,10 +14,10 @@
 
 JNIEnv* currentEnv = NULL;
 
-typedef struct _Texture {
+struct Texture {
 	AndroidBitmapInfo info;
 	jobject bitmap;
-} Texture;
+};
 
 static Texture* textureTable;
 
@@ -25,21 +25,13 @@ static const int TEXTURE_SIZE = 64;
 
 int mapWidth, mapHeight;
 
-typedef struct _Vec2 {
+struct Vec2 {
 	float x, y;
-} Vec2;
+};
 
-typedef struct _Camera {
+struct Camera {
 	Vec2 pos, dir, plane;
-} Camera;
-
-typedef struct _RayInfo {
-	float wallDist;
-	int mapX, mapY;
-	float floorXWall, floorYWall;
-	int textureX;
-	int tileId;
-} RayInfo;
+};
 
 void extractRgb565(uint16_t color, uint8_t* r, uint8_t* g, uint8_t* b)
 {
@@ -79,11 +71,44 @@ uint16_t computeIntensity(uint16_t pixel, float objectIntensity, float multiplie
     return composeRgb565(r, g, b);
 }
 
-RayInfo castRay(Camera, int, jint*, int, int);
+class Raycaster
+{
+public:
+  Raycaster(Camera camera, 
+    AndroidBitmapInfo* bmpInfo, void* bmpPixels,
+    jint* tileMap, jint* floorMap, jint* ceilMap)
+   : m_camera(camera),
+     m_bmpInfo(bmpInfo),
+     m_bmpPixels(bmpPixels),
+     m_tileMap(tileMap),
+     m_floorMap(floorMap),
+     m_ceilMap(ceilMap)
+  {
+  }
 
-void raycast(Camera camera, 
-	AndroidBitmapInfo* bmpInfo, void* bmpPixels,
-	jint* tileMap, jint* floorMap, jint* ceilMap) 
+  void raycast();
+private:
+  struct RayInfo {
+    float wallDist;
+    int mapX, mapY;
+    float floorXWall, floorYWall;
+    int textureX;
+    int tileId;
+  };
+
+  RayInfo castRay(int x, int width, int height);
+
+private:
+  Camera m_camera;
+  AndroidBitmapInfo* m_bmpInfo;
+  void* m_bmpPixels;
+
+  jint* m_tileMap;
+  jint* m_floorMap;
+  jint* m_ceilMap;
+};
+
+void Raycaster::raycast() 
 {
 	int x, y;
 	
@@ -95,15 +120,15 @@ void raycast(Camera camera,
 	void* floorPixels;
 	void* ceilPixels;
 
-	for (x = 0; x < bmpInfo->width; x++) {
+	for (x = 0; x < m_bmpInfo->width; x++) {
 		// Point to start of bmpPixels
-		void* currentPixels = bmpPixels;
+		void* currentPixels = m_bmpPixels;
 
 		int lineHeight;
 		float wallDist, cameraDist = 0.0f, currentDist;
 		int wallStart, wallEnd;
 		
-		RayInfo info = castRay(camera, x, tileMap, bmpInfo->width, bmpInfo->height);
+		RayInfo info = castRay(x, m_bmpInfo->width, m_bmpInfo->height);
 		int textureId = info.tileId - 1;	// 0 is "emtpy"
 
 		// TODO: Shall depend on textur ID in tilemap.
@@ -113,20 +138,20 @@ void raycast(Camera camera,
 
 		// m_zbuffer[x] = info.wallDist;
 		
-		lineHeight = (int)fabs((float)bmpInfo->height / info.wallDist);
-		wallStart = -lineHeight / 2 + bmpInfo->height / 2;
-		wallEnd = lineHeight / 2 + bmpInfo->height / 2;
+		lineHeight = (int)fabs((float)m_bmpInfo->height / info.wallDist);
+		wallStart = -lineHeight / 2 + m_bmpInfo->height / 2;
+		wallEnd = lineHeight / 2 + m_bmpInfo->height / 2;
 		if  (wallStart < 0) wallStart = 0;
-		if (wallEnd >= bmpInfo->height) wallEnd = bmpInfo->height - 1;
+		if (wallEnd >= m_bmpInfo->height) wallEnd = m_bmpInfo->height - 1;
 		
 		// Set pointer to current line
-		currentPixels = (char*) currentPixels + bmpInfo->stride * wallStart;
+		currentPixels = (char*) currentPixels + m_bmpInfo->stride * wallStart;
 		for (y = wallStart; y < wallEnd; y++) {
 			uint16_t* line = (uint16_t *) currentPixels;
 			
 			int d, textureY;
 			
-			d = y * 256 - bmpInfo->height * 128 + lineHeight * 128;
+			d = y * 256 - m_bmpInfo->height * 128 + lineHeight * 128;
 			textureY = ((d * TEXTURE_SIZE) / lineHeight) / 256;
 
 			void* texturePointer = wallPixels;
@@ -138,19 +163,19 @@ void raycast(Camera camera,
 			line[x] = computeIntensity(color, 0.5, 1.0, info.wallDist);
 			
 			// Advance pointer.
-			currentPixels = (char*)currentPixels + bmpInfo->stride;
+			currentPixels = (char*)currentPixels + m_bmpInfo->stride;
 		}
 	
 		
 		if (wallEnd < 0) {
-			wallEnd = bmpInfo->height;
+			wallEnd = m_bmpInfo->height;
 		}
 
 		// Reset pointer
-		currentPixels = bmpPixels;
+		currentPixels = m_bmpPixels;
 		// Point to the line where the wall ends.
-		currentPixels = (char*) currentPixels + bmpInfo->stride * (wallEnd + 1);		
-		for (y = wallEnd + 1; y < bmpInfo->height; y++) {
+		currentPixels = (char*) currentPixels + m_bmpInfo->stride * (wallEnd + 1);		
+		for (y = wallEnd + 1; y < m_bmpInfo->height; y++) {
 			uint16_t* line = (uint16_t *) currentPixels;
 
 			
@@ -159,18 +184,18 @@ void raycast(Camera camera,
 			float currentFloorX, currentFloorY;
 			int textureIndex;
 
-			currentDist = (float)bmpInfo->height / (2.0f * y - bmpInfo->height);
+			currentDist = (float)m_bmpInfo->height / (2.0f * y - m_bmpInfo->height);
 			
 			weight = (currentDist - cameraDist) / (info.wallDist - cameraDist);
-			currentFloorX = weight * info.floorXWall + (1.0f - weight) * camera.pos.x;
-			currentFloorY = weight * info.floorYWall + (1.0f - weight) * camera.pos.y;
+			currentFloorX = weight * info.floorXWall + (1.0f - weight) * m_camera.pos.x;
+			currentFloorY = weight * info.floorYWall + (1.0f - weight) * m_camera.pos.y;
 			floorTextureX = (int)(currentFloorX * TEXTURE_SIZE) % TEXTURE_SIZE;
 			floorTextureY = (int)(currentFloorY * TEXTURE_SIZE) % TEXTURE_SIZE;
 			
 			textureIndex = (int)currentFloorY * mapWidth + (int)currentFloorX;
 
-			floorTexture = &textureTable[floorMap[textureIndex] - 1];
-			ceilTexture = &textureTable[ceilMap[textureIndex] - 1];
+			floorTexture = &textureTable[m_floorMap[textureIndex] - 1];
+			ceilTexture = &textureTable[m_ceilMap[textureIndex] - 1];
 			AndroidBitmap_lockPixels(currentEnv, floorTexture->bitmap, &floorPixels);
 			AndroidBitmap_lockPixels(currentEnv, ceilTexture->bitmap, &ceilPixels);
 
@@ -190,12 +215,12 @@ void raycast(Camera camera,
 
 			color = textureLine[floorTextureX];
 
-			void* ceilLoc = bmpPixels;
-			ceilLoc = (char*)ceilLoc + bmpInfo->stride * (bmpInfo->height - y);
+			void* ceilLoc = m_bmpPixels;
+			ceilLoc = (char*)ceilLoc + m_bmpInfo->stride * (m_bmpInfo->height - y);
 			line = (uint16_t *) ceilLoc;
 			line[x] = computeIntensity(color, 0.5, 1.0, currentDist);
 	
-			currentPixels = (char*)currentPixels + bmpInfo->stride;
+			currentPixels = (char*)currentPixels + m_bmpInfo->stride;
 
 			AndroidBitmap_unlockPixels(currentEnv, floorTexture->bitmap);
 			AndroidBitmap_unlockPixels(currentEnv, ceilTexture->bitmap);
@@ -207,7 +232,8 @@ void raycast(Camera camera,
 	
 }
 
-RayInfo castRay(Camera camera, int x, jint* tileMap, int width, int height) {
+Raycaster::RayInfo Raycaster::castRay(int x, int width, int height) 
+{
 	int mapX, mapY;
 	float sideDistX, sideDistY;
 	float ddx, ddy;
@@ -219,9 +245,9 @@ RayInfo castRay(Camera camera, int x, jint* tileMap, int width, int height) {
 	float floorXWall, floorYWall;
 	
 	float camX = 2.0f * (float)x / (float)width - 1.0f;
-	Vec2 ray = camera.pos;
-	Vec2 rayDir = { camera.dir.x + camera.plane.x * camX,
-					camera.dir.y + camera.plane.y * camX };
+	Vec2 ray = m_camera.pos;
+	Vec2 rayDir = { m_camera.dir.x + m_camera.plane.x * camX,
+					m_camera.dir.y + m_camera.plane.y * camX };
 	
 	mapX = (int) ray.x;
 	mapY = (int) ray.y;
@@ -256,7 +282,7 @@ RayInfo castRay(Camera camera, int x, jint* tileMap, int width, int height) {
 			side = 1;
 		}
 		
-		if (tileMap[mapY * mapWidth + mapX] != 0) {
+		if (m_tileMap[mapY * mapWidth + mapX] != 0) {
 			break;
 		}
 	}
@@ -302,7 +328,7 @@ RayInfo castRay(Camera camera, int x, jint* tileMap, int width, int height) {
 		floorXWall,
 		floorYWall,
 		textureX,
-		tileMap[mapY * mapWidth + mapX]
+		m_tileMap[mapY * mapWidth + mapX]
 	};
 	
 	return info;
@@ -368,9 +394,11 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 	jint* ceilMap = env->GetIntArrayElements(_ceilMap, NULL);
 
 //	LOGE("***  CALLING RAYCAST ***");	
-	raycast(camera, 
-		&bitmapInfo, pixels, 
-		tileMap, floorMap, ceilMap);
+
+  Raycaster raycaster(camera, 
+    &bitmapInfo, pixels, 
+    tileMap, floorMap, ceilMap);
+  raycaster.raycast();
 
 //	LOGE("***  UNLOCKING PIXELS ***");
 
