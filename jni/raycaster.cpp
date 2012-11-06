@@ -2,8 +2,8 @@
 #include <android/bitmap.h>
 #include <android/log.h>
 
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 
 #define  LOG_TAG    "libraycast"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
@@ -308,7 +308,9 @@ RayInfo castRay(Camera camera, int x, jint* tileMap, int width, int height) {
 	return info;
 }
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * JNI Export Function
@@ -361,9 +363,9 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 	mapHeight = height;
 	
 //	LOGE("***  GETTING INT ARRAY ELEMENTS ***");
-	jint* tileMap = (*env)->GetIntArrayElements(env, _tileMap, NULL);
-	jint* floorMap = (*env)->GetIntArrayElements(env, _floorMap, NULL);
-	jint* ceilMap = (*env)->GetIntArrayElements(env, _ceilMap, NULL);
+	jint* tileMap = env->GetIntArrayElements(_tileMap, NULL);
+	jint* floorMap = env->GetIntArrayElements(_floorMap, NULL);
+	jint* ceilMap = env->GetIntArrayElements(_ceilMap, NULL);
 
 //	LOGE("***  CALLING RAYCAST ***");	
 	raycast(camera, 
@@ -375,9 +377,9 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_raycast
 	AndroidBitmap_unlockPixels(env, bitmap);
 	
 //	LOGE("*** RELEASING ARRAY ***");
-	(*env)->ReleaseIntArrayElements(env, _tileMap, tileMap, 0);
-	(*env)->ReleaseIntArrayElements(env, _floorMap, floorMap, 0);
-	(*env)->ReleaseIntArrayElements(env, _ceilMap, ceilMap, 0);
+	env->ReleaseIntArrayElements(_tileMap, tileMap, 0);
+	env->ReleaseIntArrayElements(_floorMap, floorMap, 0);
+	env->ReleaseIntArrayElements(_ceilMap, ceilMap, 0);
 	
 //	LOGE("*** ALL DONE ***");
 }
@@ -387,7 +389,7 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_reserve
 {
 	LOGI("Reserving texture space for %d textures", (int)numberOfTextures);
 
-	textureTable = calloc((int)numberOfTextures, sizeof(Texture));
+	textureTable = new Texture[static_cast<int>(numberOfTextures)];
 }
 
 JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_registerTexture
@@ -418,7 +420,11 @@ JNIEXPORT void JNICALL Java_com_redapplecandy_minirpg_graphics_Raycaster_registe
 
 	Texture _texture;
 	_texture.info = textureInfo;
-	_texture.bitmap = (*env)->NewGlobalRef(env, texture);	// TODO: Must be freed later with DeletGlobalRef!
+	_texture.bitmap = env->NewGlobalRef(texture);	// TODO: Must be freed later with DeletGlobalRef!
 
 	textureTable[textureNumber] = _texture;
 }
+
+#ifdef __cplusplus
+}
+#endif
