@@ -260,8 +260,8 @@ void Raycaster::raycast()
 
     AndroidBitmap_lockPixels(currentEnv, spriteTexture->bitmap, &spritePixels);
 
-    float spriteX = sprite->position().x;
-    float spriteY = sprite->position().y;
+    float spriteX = sprite->position().x - m_camera.pos.x;
+    float spriteY = sprite->position().y - m_camera.pos.y;
 
     float invDet = 1.0f / (m_camera.plane.x * m_camera.dir.y - m_camera.dir.x * m_camera.plane.y);
 
@@ -269,11 +269,11 @@ void Raycaster::raycast()
     float transformY = invDet * (-m_camera.plane.y * spriteX + m_camera.plane.x * spriteY);
 
     int spriteScreenX = static_cast<int>(
-        (m_bmpInfo->width / 2) * (1 + transformX / transformY)
+        static_cast<float>((m_bmpInfo->width / 2)) * (1.0f + transformX / transformY)
       );
 
     // Height of sprite
-    int spriteHeight = abs( static_cast<int> (m_bmpInfo->height / transformY) );
+    int spriteHeight = abs( static_cast<int> ( static_cast<float>(m_bmpInfo->height) / transformY) );
 
     int drawStartY = -spriteHeight / 2 + m_bmpInfo->height / 2;
     if (drawStartY < 0) drawStartY = 0;
@@ -282,25 +282,26 @@ void Raycaster::raycast()
     if (drawEndY >= m_bmpInfo->height) drawEndY = m_bmpInfo->height - 1;
 
     // Width of sprite
-    int spriteWidth = abs( static_cast<int> (m_bmpInfo->height / transformY) );
+    int spriteWidth = abs( static_cast<int> ( static_cast<float>(m_bmpInfo->height) / transformY) );
 
     int drawStartX = -spriteWidth / 2 + spriteScreenX;
     if (drawStartX < 0) drawStartX = 0;
 
     int drawEndX = spriteWidth / 2 + spriteScreenX;
+    if (drawEndX < 0) drawEndX = 0;
     if (drawEndX >= m_bmpInfo->width) drawEndX = m_bmpInfo->width - 1;
 
-    for (x = drawStartX; x < drawEndX; x++)  // <= ?
+    for (x = drawStartX; x < drawEndX; x++)
     {
-      currentPixels = (char*)currentPixels + m_bmpInfo->stride * drawStartY + x;
+      currentPixels = (char*)currentPixels + m_bmpInfo->stride * drawStartY;
 
       int texX = static_cast<int>(
         256 * (x - (-spriteWidth / 2 + spriteScreenX)) * TEXTURE_SIZE / spriteWidth
       ) / 256;
 
-      if (transformY > 0 && x > 0 && x < m_bmpInfo->width && transformY < zbuffer[x])
+      if (transformY > 0 && x >= 0 && x < m_bmpInfo->width && transformY < zbuffer[x])
       {
-        for (y = drawStartY; y < drawEndY; y++) // <= ?
+        for (y = drawStartY; y < drawEndY; y++)
         {
           uint16_t* line = (uint16_t *) currentPixels;
 
@@ -315,7 +316,7 @@ void Raycaster::raycast()
 
           if (color)
           {
-            line[x] = color;
+            line[x] = computeIntensity(color, 0.5, 1.0, transformY);
           }
 
           currentPixels = (char*)currentPixels + m_bmpInfo->stride;
