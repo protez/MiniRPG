@@ -207,36 +207,44 @@ void Raycaster::raycast()
 			
 			textureIndex = (int)currentFloorY * mapWidth + (int)currentFloorX;
 
-			floorTexture = &textureTable[m_floorMap[textureIndex] - 1];
-			ceilTexture = &textureTable[m_ceilMap[textureIndex] - 1];
-			AndroidBitmap_lockPixels(currentEnv, floorTexture->bitmap, &floorPixels);
-			AndroidBitmap_lockPixels(currentEnv, ceilTexture->bitmap, &ceilPixels);
+      // Floor
+      if (m_floorMap[textureIndex] > 0)
+      {
+        floorTexture = &textureTable[m_floorMap[textureIndex] - 1];
+        AndroidBitmap_lockPixels(currentEnv, floorTexture->bitmap, &floorPixels);
 
-			// Floor
-			void* texturePointer = floorPixels;
-			texturePointer = (char*)texturePointer + floorTexture->info.stride * floorTextureY;
-			uint16_t* textureLine = (uint16_t*) texturePointer;
-			
-			uint16_t color = textureLine[floorTextureX];
+        void* texturePointer = floorPixels;
+        texturePointer = (char*)texturePointer + floorTexture->info.stride * floorTextureY;
+        uint16_t* textureLine = (uint16_t*) texturePointer;
+        
+        uint16_t color = textureLine[floorTextureX];
 
-			line[x] = computeIntensity(color, 0.5, 1.0, currentDist);
+        line[x] = computeIntensity(color, 0.5, 1.0, currentDist);
 
-			// Ceiling
-			texturePointer = ceilPixels;
-			texturePointer = (char*)texturePointer + ceilTexture->info.stride * floorTextureY;
-			textureLine = (uint16_t*)texturePointer;
+        AndroidBitmap_unlockPixels(currentEnv, floorTexture->bitmap);
+      }
 
-			color = textureLine[floorTextureX];
+      // Ceiling
+      if (m_ceilMap[textureIndex] > 0)
+      {
+        ceilTexture = &textureTable[m_ceilMap[textureIndex] - 1];
+        AndroidBitmap_lockPixels(currentEnv, ceilTexture->bitmap, &ceilPixels);
 
-			void* ceilLoc = m_bmpPixels;
-			ceilLoc = (char*)ceilLoc + m_bmpInfo->stride * (m_bmpInfo->height - y);
-			line = (uint16_t *) ceilLoc;
-			line[x] = computeIntensity(color, 0.5, 1.0, currentDist);
-	
-			currentPixels = (char*)currentPixels + m_bmpInfo->stride;
+        void* texturePointer = ceilPixels;
+        texturePointer = (char*)texturePointer + ceilTexture->info.stride * floorTextureY;
+        uint16_t* textureLine = (uint16_t*)texturePointer;
 
-			AndroidBitmap_unlockPixels(currentEnv, floorTexture->bitmap);
-			AndroidBitmap_unlockPixels(currentEnv, ceilTexture->bitmap);
+        uint16_t color = textureLine[floorTextureX];
+
+        void* ceilLoc = m_bmpPixels;
+        ceilLoc = (char*)ceilLoc + m_bmpInfo->stride * (m_bmpInfo->height - y);
+        line = (uint16_t *) ceilLoc;
+        line[x] = computeIntensity(color, 0.5, 1.0, currentDist);
+
+        AndroidBitmap_unlockPixels(currentEnv, ceilTexture->bitmap);
+      }
+
+      currentPixels = (char*)currentPixels + m_bmpInfo->stride;
 		}
 	
 		AndroidBitmap_unlockPixels(currentEnv, wallTexture->bitmap);
