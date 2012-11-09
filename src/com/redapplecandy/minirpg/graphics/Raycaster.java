@@ -30,9 +30,13 @@ public class Raycaster {
 	private Bitmap m_wallTexture, m_floorTexture, m_devilTexture;
 	private Bitmap m_target;
 	
+	private Bitmap m_skybox;	// TODO: This shouldn't be here.
+	
 	private Bitmap[] m_textures;
 	
 	private Matrix m_drawMatrix = new Matrix();
+	
+	private int m_pixels[];
 	
 	public Raycaster(int width, int height) {
 		m_width = width;
@@ -69,6 +73,9 @@ public class Raycaster {
 				{2, 2, 2, 2, 2, 2, 2, 2},
 		};
 		
+		m_skybox = BitmapLoader.instance().loadById(R.drawable.skybox);
+		m_pixels = new int[m_skybox.getWidth() * m_skybox.getHeight()];
+		
 		m_tileMap = tileMap;
 		m_floorMap = floorMap;
 		m_ceilMap = ceilMap;
@@ -94,6 +101,9 @@ public class Raycaster {
 	
 	public void draw(Camera camera, Canvas canvas) {
 		m_target.eraseColor(0);
+		
+		m_skybox.getPixels(m_pixels, 0, m_skybox.getWidth(), 0, 0, m_skybox.getWidth(), m_skybox.getHeight());
+		m_target.setPixels(m_pixels, 0, m_skybox.getWidth(), 0, 0, m_skybox.getWidth(), m_skybox.getHeight());
 		//raycast(camera);
 		raycast(m_target,
 			ArrayUtils.flattenIntMatrix(m_tileMap),
