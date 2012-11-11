@@ -5,7 +5,9 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 
 import com.redapplecandy.minirpg.Config;
+import com.redapplecandy.minirpg.R;
 import com.redapplecandy.minirpg.character.PlayerCharacter;
+import com.redapplecandy.minirpg.graphics.Text;
 import com.redapplecandy.minirpg.util.MathUtils;
 
 /**
@@ -49,16 +51,20 @@ public class CharacterWidget extends InvisibleButton {
 				MathUtils.scaleY(m_y + m_height - 4, ch), fill);
 		
 		Paint textPaint = new Paint();
-		Typeface typeface = Typeface.create("Helvetica", Typeface.NORMAL);
+		Typeface typeface = Typeface.SANS_SERIF;
 		textPaint.setTypeface(typeface);
 		textPaint.setARGB(255, 255, 255, 255);
 		
+//		Text.drawText(canvas, m_chr.name(), m_x + 6, m_y + 16, R.drawable.font_8x8);
 		canvas.drawText(m_chr.name(), 
 			MathUtils.scaleX(m_x + 6, cw), 
 			MathUtils.scaleY(m_y + 16, ch), textPaint);
 		
 		Integer curHp = m_chr.currentHp();
 		Integer maxHp = m_chr.maxHp();
+		
+//		Text.drawText(canvas, "HP " + curHp.toString(), m_x + 6, m_y + 32, R.drawable.font_8x8);
+//		Text.drawText(canvas, "SP " + curHp.toString(), m_x + 6, m_y + 42, R.drawable.font_8x8);
 		
 		canvas.drawText("HP " + curHp.toString() + "/" + maxHp.toString(), 
 			MathUtils.scaleX(m_x + 6, cw), 

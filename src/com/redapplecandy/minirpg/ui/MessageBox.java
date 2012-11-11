@@ -103,13 +103,18 @@ public class MessageBox {
 		
 		Paint textPaint = new Paint();
 		textPaint.setARGB(255, 255, 255, 255);
-		Typeface typeface = Typeface.create("Helvetica", Typeface.NORMAL);
+		Typeface typeface = Typeface.SANS_SERIF;
 		textPaint.setTypeface(typeface);
 		for (int i = 0; i < m_buffer.length; i++) {
 			canvas.drawText(m_buffer[i], 
 				MathUtils.scaleX(m_x + 8, cw),
 				MathUtils.scaleY(m_y + (i+1)*16, ch),
 				textPaint);
+//			Text.drawText(
+//					canvas,
+//					m_buffer[i], 
+//					m_x + 8, m_y + (i+1)*16,
+//					R.drawable.font_8x8);
 		}
 	}
 }

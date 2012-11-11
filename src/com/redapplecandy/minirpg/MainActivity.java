@@ -33,7 +33,6 @@ public class MainActivity extends Activity {
         
         m_renderView = (RenderView) findViewById(R.id.gameView);
         BitmapLoader.instance().setContext(this);
-        TileManager.instance();
         
         m_renderView.raycaster = new Raycaster(Config.MAIN_WINDOW_WIDTH, 200);
         Core.instance().setRenderView(m_renderView);
@@ -41,7 +40,7 @@ public class MainActivity extends Activity {
         //m_renderView.createFeature();
         
     	m_up = new InvisibleButton(0, 0, Config.BASE_WIDTH, 64);
-    	m_down = new InvisibleButton(0, Config.BASE_HEIGHT - 64, Config.BASE_WIDTH, 64);
+//    	m_down = new InvisibleButton(0, Config.BASE_HEIGHT - 64, Config.BASE_WIDTH, 64);
     	
     	m_turnLeft = new InvisibleButton(0, 64, 64, Config.BASE_HEIGHT - 128);
     	m_turnRight = new InvisibleButton(Config.BASE_WIDTH - 64, 64, 64, Config.BASE_HEIGHT - 128);
@@ -93,20 +92,20 @@ public class MainActivity extends Activity {
         	
         });
 
-        m_down.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Core core = Core.instance();
-				
-				if (core.currentState() == Core.STATE_WALK_AROUND) {
-					
-					core.step(-0.1f);
-				
-				}
-			}
-        	
-        });
+//        m_down.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View v) {
+//				Core core = Core.instance();
+//				
+//				if (core.currentState() == Core.STATE_WALK_AROUND) {
+//					
+//					core.step(-0.1f);
+//				
+//				}
+//			}
+//        	
+//        });
         
     }
 }

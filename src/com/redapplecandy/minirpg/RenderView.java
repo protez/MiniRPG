@@ -6,12 +6,9 @@ import com.redapplecandy.minirpg.character.PlayerCharacter;
 import com.redapplecandy.minirpg.graphics.Raycaster;
 import com.redapplecandy.minirpg.ui.CharacterWidget;
 import com.redapplecandy.minirpg.ui.InvisibleButton;
-import com.redapplecandy.minirpg.ui.MessageBox;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -151,6 +148,14 @@ public class RenderView extends SurfaceView implements OnTouchListener, SurfaceH
 		holder.addCallback(this);
 		m_gameThread = new GameThread(holder);
 		
+		addButton(characterWidget);
+		characterWidget.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Core.instance().startMessage("hurr durr");
+			}
+		});
 		
 		setOnTouchListener(this);
 	}
@@ -184,7 +189,7 @@ public class RenderView extends SurfaceView implements OnTouchListener, SurfaceH
 				// If STATE == WALK_AROUND then fire movement events.
 				
 				for (InvisibleButton b : m_buttons) {
-					if (b.isClicked(x, y)) {
+					if (b != null && b.isClicked(x, y)) {
 						b.fireClick();
 					}
 				}

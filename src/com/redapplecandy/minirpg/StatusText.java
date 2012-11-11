@@ -12,12 +12,11 @@ public class StatusText {
 	public static void draw(Canvas canvas) {
 		Paint textPaint = new Paint();
 		textPaint.setARGB(255, 255, 255, 255);
-		Typeface typeface = Typeface.create("Helvetica", Typeface.NORMAL);
+		Typeface typeface = Typeface.SANS_SERIF;
 		textPaint.setTypeface(typeface);
 		canvas.drawText(statusText, 
 			MathUtils.scaleX(Config.VIEW_CORNER_X + 4, canvas.getWidth()), 
 			MathUtils.scaleY(Config.STATUS_BAR_POS, canvas.getHeight()), 
 			textPaint);
-		//
 	}
 }
